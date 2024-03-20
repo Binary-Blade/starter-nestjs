@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { SecurityService } from '../auth/security.service';
+import { SecurityService } from 'src/common/security/security.service';
 
 @Injectable()
 export class UsersService {
@@ -40,6 +40,7 @@ export class UsersService {
     return user;
   }
 
+  // TODO: VERIFY IF Only user can update himself
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.findOneBy({ userId: id });
     if (!user) {
