@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsStrongPassword } from "class-validator";
+import { UserRole } from "src/common/enum/user-role.enum";
 
 export class CreateUserDto {
 
@@ -7,6 +8,10 @@ export class CreateUserDto {
   readonly email: string;
 
   @IsNotEmpty()
-  //TODO: Add that for production : @IsStrongPassword()
+  // TODO: Remove it after testing that for production - 20/03
+  // @IsStrongPassword()
   readonly password: string;
+
+  readonly role?: UserRole;
+
 }
