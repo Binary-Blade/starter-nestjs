@@ -20,7 +20,4 @@ export class User {
 
   // @OneToMany(() => Task, (task) => task.user)
   // tasks: Task[];
-
-  // @OneToMany(() => Category, (category) => category.user)
-  // categories: Category[];
 }
