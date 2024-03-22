@@ -1,14 +1,19 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
 import { JWTTokens } from "src/common/interfaces/jwt.interface";
 import { User } from "src/modules/users/entities/user.entity";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class TokenService {
   constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     private jwtService: JwtService,
-    private configService: ConfigService
+    private configService: ConfigService,
+
   ) { }
 
   async getTokens(user: User): Promise<JWTTokens> {
@@ -31,21 +36,17 @@ export class TokenService {
     return { token, refreshToken }
   }
 
+  async refreshToken(token: string): Promise<JWTTokens> {
+    try {
+      const { sub: userId } = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+      });
+      const user = await this.usersRepository.findOneOrFail({ where: { userId } });
 
-  //TODO: Add Refreshtoken later - 21/03
-
-  // async refreshToken(token: string): Promise<JWTTokens> {
-  //     try {
-  //       const { sub: userId } = await this.jwtService.verifyAsync(token, {
-  //         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
-  //       });
-  //       const user = await this..findOneOrFail({ where: { userId } });
-  //
-  //       return this.getTokens(user);
-  //     } catch (err) {
-  //       throw new UnauthorizedException();
-  //     }
-  //   }
-
+      return this.getTokens(user);
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
+  }
 
 }
