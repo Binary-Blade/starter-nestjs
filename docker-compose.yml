@@ -3,8 +3,8 @@ version: '3.9'
 services:
   # DATABASE - POSTGRESQL
   # Choose your DB link to ENV
-  db-postgres:
-    container_name: dbpostgreSQL
+  postgres:
+    container_name: db-postgres
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${DB_USERNAME}
@@ -13,16 +13,14 @@ services:
     restart: always
     ports:
       - 5432:5432
+    volumes:
+      - pg-data:/var/lib/postgresql/data 
     networks:
       - app
 
   # SERVER - NESTJS
-  api-nestjs:
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  dev:
+    container_name: nestjs-server
     build:
       context: .
       dockerfile: Dockerfile
@@ -33,14 +31,13 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - db-postgres 
+      - postgres 
     command: [sh, -c, 'pnpm run start:dev']
     volumes:
       - .:/app:delegated
-      - /app/node_modules
 
 networks: 
   app:
 
 volumes:
-  pg-data: {} # PERSISTENT VOLUME POSTGRESQL - DB
+  pg-data:  # PERSISTENT VOLUME POSTGRESQL - DB

@@ -4,7 +4,6 @@ ARG IMAGE=node:18.19.0-alpine
 FROM $IMAGE as builder
 WORKDIR /app
 COPY . .
-RUN apk add --no-cache curl 
 RUN npm install -g pnpm && \
     pnpm install
 
