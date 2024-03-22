@@ -25,9 +25,9 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<JWTTokens> {
     const user = await this.usersRepository.findOneBy({ email });
-    const validPassword = await this.securityService.verifyPassword(user.password, password);
-
     if (!user) throw new InvalidCredentialsException();
+
+    const validPassword = await this.securityService.verifyPassword(user.password, password);
     if (!validPassword) throw new InvalidCredentialsException();
 
     return this.tokenService.getTokens(user);
