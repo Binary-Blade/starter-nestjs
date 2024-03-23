@@ -7,35 +7,36 @@
 
 # NestJS Starter Kit
 
-This NestJS Starter Kit is designed to serve as a foundation for building scalable and maintainable applications using the NestJS framework. It comes pre-configured with essential modules for authentication, authorization, and other core features.
+This NestJS Starter Kit serves as a robust foundation for building scalable and maintainable backend applications with the NestJS framework. 
+It comes equipped with pre-configured modules for authentication, authorization, and various core functionalities, ensuring a solid starting point for any project.
+
 ## Features
 
-- **TypeORM Integration**: Pre-configured TypeORM setup with sensible defaults for database interaction.
-- **Authentication System**: A robust authentication system using JWT for access and refresh tokens.
-- **User Management**: Pre-built user entity, service, and module for user registration, profile management, and more.
-- **Security Practices**: Security modules for password hashing and token management.
-- **Decorators**: Custom decorators for roles and authorization.
-- **Configuration Management**: Environment-specific configuration setup for easy management of application settings.
-- **Health Check**: Ready-to-use health check endpoint for monitoring application status.
+- **TypeORM Integration**: Pre-configured TypeORM for efficient database interaction with support for automatic migrations.
+- **Authentication System**: Robust JWT-based authentication with access and refresh token support.
+- **User Management**: Comprehensive user module for registration, profile management, and more, including custom user roles.
+- **Security Practices**: Enhanced security with password hashing and token management.
+- **Custom Decorators**: Utilizes custom decorators for roles and authorization to protect routes based on user roles.
+- **Configuration Management**: Environment-specific configuration setup leveraging `.env` files for seamless application settings management.
+- **Health Check**: Built-in health check endpoint for monitoring application health and status.
 
 ## Project Structure
 
 ```plaintext
 src/
-├── common/ # Common module with guards, decorators, and exceptions
-├── config/ # Configuration management, database and security settings
-│ ├──── database/ # Database configuration and entities
-│ ├──── migrations/ # TypeORM migrations
-│ └──── securities/ # Security modules for hashing and token management
+├── common/                 # Common module with guards, decorators, and exceptions
+├── config/                 # Configuration management and securities
+│   ├──── database/         # Database configuration and entities
+│   ├──── migrations/       # TypeORM migrations
+│   └──── securities/       # Security modules for hashing and token management
 ├── modules/
-│ ├──── auth/ # Authentication module with login, signup, and guards
-│ └──── users/ # User module with user entity and service
-├── app.module.ts # Main application module
-└── main.ts # Entry file for the application
+│   ├──── auth/             # Authentication module with login, signup, and guards
+│   └──── users/            # User module with user entity and service
+├── app.module.ts           # Main application module
+└── main.ts                 # Application entry file
 test/
-├── auth.e2e-spec.ts # End-to-end tests for authentication
-└── users.e2e-spec.ts # End-to-end tests for user management
-```
+├── auth.e2e-spec.ts        # End-to-end tests for authentication
+└── users.e2e-spec.ts       # End-to-end tests for user management```
 
 ## Getting Started
 
@@ -52,34 +53,36 @@ This project is designed to get you up and running with a fully configured NestJ
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/Binary-Blade/starter-nestjs.git 
 cd your-repo-name
 ```
 
 2. Environment variables are provided in a .env file within the cloned repository. These include configurations for the database, JWT tokens, and the application environment. Here's an example of what's included:
 ```env
 # Database Configuration
-DB_HOST=postgres
-DB_PORT=5432
-DB_NAME=dev
-DB_USERNAME=admin-db
-DB_PASSWORD=password
-# NOTE: Switch to true in production mode
-DB_SYNCHRONIZE=false 
+DB_HOST=postgres                  # The hostname of the database server.
+DB_PORT=5432                      # The port number on which the database server is listening.
+DB_NAME=dev                       # The name of the database to connect to.
+DB_USERNAME=admin-db              # The username used for the database connection.
+DB_PASSWORD=password              # The password used for the database connection.
+DB_SYNCHRONIZE=true               # Controls whether the database schema should be auto-created on every application launch. Use with caution in production!
 
-# TokenJWT
-JWT_ACCESS_TOKEN_SECRET=secret-key
-JWT_ACCESS_TOKEN_EXPIRATION=10d
-JWT_REFRESH_TOKEN_SECRET=secret-key
-JWT_REFRESH_TOKEN_EXPIRATION=30d
+# JWT Configuration
+JWT_ACCESS_TOKEN_SECRET=secret-key       # The secret key for signing JWT access tokens.
+JWT_ACCESS_TOKEN_EXPIRATION=10d          # The expiration time for JWT access tokens.
+JWT_REFRESH_TOKEN_SECRET=secret-key      # The secret key for signing JWT refresh tokens.
+JWT_REFRESH_TOKEN_EXPIRATION=30d         # The expiration time for JWT refresh tokens.
 
+# Server Configuration
+PORT=3000                         # The port number on which the NestJS server will listen.
 # Environment
-NODE_ENV=development
-```
+NODE_ENV=development              # The environment in which the application is running. Use 'production' for production environments.```
 
 Make sure to review and modify the .env file according to your development and production needs.
 
-3. Next, start the development environment with Docker Compose:
+3. Start the Development Environment:
+
+With Docker Compose, you can spin up the application and its dependencies easily:
 
 ```bash
 docker-compose up -d
@@ -88,20 +91,20 @@ docker-compose up -d
 This command will spin up the PostgreSQL database service and the NestJS application in development mode. The application will watch for file changes and will restart automatically, reflecting any updates you make to the code.
 
 ## Running Migrations
+Migrations manage your database schema evolution. Create and run migrations using the provided Make commands:
 
-To create a new migration, run the following command:
-
+- Create a new migration:
 ```bash
 name=your-migration-name pnpm run migrate-create
 ```
 
-To run pending migrations, execute the following command:
+- Run pending migrations:
 
 ```bash
 make migrate-run
 ```
 
-If you need to revert the most recent migration, you can do so with:
+- Run the last migration:
 
 ```bash
 make migrate-revert
