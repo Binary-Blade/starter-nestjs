@@ -1,13 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Repository } from 'typeorm';
-import { JWTTokens } from 'src/common/interfaces/jwt.interface';
-import { SecurityService } from 'src/config/securities/security.service';
-import { InvalidCredentialsException } from 'src/common/exceptions/invalid-credentials.exception';
-import { TokenService } from 'src/config/securities/token.service';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { JWTTokens } from '@common/interfaces/jwt.interface';
+import { SecurityService } from '@config/securities/security.service';
+import { InvalidCredentialsException } from '@common/exceptions/invalid-credentials.exception';
+import { TokenService } from '@config/securities/token.service';
 
 @Injectable()
 export class AuthService {

@@ -5,8 +5,8 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { TokenService } from 'src/config/securities/token.service';
-import { SecurityService } from 'src/config/securities/security.service';
+import { TokenService } from '@config/securities/token.service';
+import { SecurityService } from '@config/securities/security.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],

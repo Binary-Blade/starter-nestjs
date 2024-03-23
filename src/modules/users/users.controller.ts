@@ -1,11 +1,11 @@
-import { Controller, Get, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessTokenGuard } from 'src/common/guards/access-token.guard';
-import { Role } from 'src/common/decorators/role.decorator';
-import { RoleGuard } from 'src/common/guards/role.guard';
-import { UserRole } from 'src/common/enums/user-role.enum';
-import { CreatorGuard } from 'src/common/guards/creator.guard';
+import { AccessTokenGuard } from '@common/guards/access-token.guard';
+import { Role } from '@common/decorators/role.decorator';
+import { RoleGuard } from '@common/guards/role.guard';
+import { CreatorGuard } from '@common/guards/creator.guard';
+import { UserRole } from './entities/user.entity';
 
 
 @UseGuards(AccessTokenGuard)
