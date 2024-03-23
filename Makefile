@@ -1,4 +1,4 @@
-.PHONY: migrate-create migrate-run migrate-revert
+.PHONY: migrate-create migrate-run migrate-revert test
 
 # Create a new migration with a name provided by the variable name.
 # Usage: make migrate-create name=CreateUsersTable
@@ -20,3 +20,6 @@ migrate-revert:
 # migrate-generate:
 # 	docker-compose exec dev pnpm run typeorm migration:generate -n $(name)
 
+
+test:
+	docker-compose exec dev pnpm run test
