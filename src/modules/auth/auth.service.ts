@@ -1,35 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
-import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { Repository } from 'typeorm';
 import { JWTTokens } from 'src/common/interfaces/jwt.interface';
 import { SecurityService } from 'src/config/securities/security.service';
 import { InvalidCredentialsException } from 'src/common/exceptions/invalid-credentials.exception';
 import { TokenService } from 'src/config/securities/token.service';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private usersService: UsersService,
     private securityService: SecurityService,
     private tokenService: TokenService,
   ) { }
 
-  async signup(createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async signup(createUserDto: CreateUserDto, role: UserRole = UserRole.USER): Promise<User> {
+    const existingUser = await this.usersRepository.findOneBy({ email: createUserDto.email });
+    if (existingUser) {
+      throw new UnauthorizedException('Email already exists');
+    }
+    const hashedPassword = await this.securityService.hashPassword(createUserDto.password);
+    const newUser = this.usersRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+      role,
+    });
+    return this.usersRepository.save(newUser);
   }
 
   async login(email: string, password: string): Promise<JWTTokens> {
     const user = await this.usersRepository.findOneBy({ email });
-    if (!user) throw new InvalidCredentialsException();
-
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
     const validPassword = await this.securityService.verifyPassword(user.password, password);
-    if (!validPassword) throw new InvalidCredentialsException();
-
+    if (!validPassword) {
+      throw new InvalidCredentialsException();
+    }
     return this.tokenService.getTokens(user);
   }
 
