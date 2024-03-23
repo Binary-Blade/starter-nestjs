@@ -36,7 +36,9 @@ src/
 └── main.ts                 # Application entry file
 test/
 ├── auth.e2e-spec.ts        # End-to-end tests for authentication
-└── users.e2e-spec.ts       # End-to-end tests for user management```
+└── users.e2e-spec.ts       # End-to-end tests for user management
+```
+
 
 ## Getting Started
 
