@@ -1,10 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { UserRole } from '../enums/user-role.enum';
 
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin'
-};
 
 @Entity('users')
 export class User {

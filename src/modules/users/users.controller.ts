@@ -5,7 +5,7 @@ import { AccessTokenGuard } from '@common/guards/access-token.guard';
 import { Role } from '@common/decorators/role.decorator';
 import { RoleGuard } from '@common/guards/role.guard';
 import { CreatorGuard } from '@common/guards/creator.guard';
-import { UserRole } from './entities/user.entity';
+import { UserRole } from './enums/user-role.enum';
 
 
 @UseGuards(AccessTokenGuard)

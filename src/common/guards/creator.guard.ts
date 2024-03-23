@@ -12,7 +12,7 @@ export class CreatorGuard implements CanActivate {
 
 		const isCreator = user && user.userId === contentOwnerId;
 		if (!isCreator) {
-			throw new NotFoundException('User not found');
+			return false;
 		}
 
 		request.isCreator = isCreator;
