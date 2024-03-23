@@ -16,8 +16,7 @@ export class TokenService {
 
   ) { }
 
-
-  // TODO: Create one unique token per user
+  // TODO: Create one unique token per user 
   async getTokens(user: User): Promise<JWTTokens> {
     const [token, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
@@ -50,5 +49,4 @@ export class TokenService {
       throw new UnauthorizedException();
     }
   }
-
 }
