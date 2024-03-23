@@ -1,11 +1,9 @@
 import { Controller, Get, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessTokenGuard } from '@common/guards/access-token.guard';
 import { Role } from '@common/decorators/role.decorator';
-import { RoleGuard } from '@common/guards/role.guard';
-import { CreatorGuard } from '@common/guards/creator.guard';
 import { UserRole } from './enums/user-role.enum';
+import { UpdateUserDto } from './dto';
+import { AccessTokenGuard, CreatorGuard, RoleGuard } from '@common/guards';
 
 /**
  * Controller that manages user operations. It includes endpoints for fetching,

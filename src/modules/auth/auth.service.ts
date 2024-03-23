@@ -3,12 +3,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@modules/users/entities/user.entity';
-import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
-import { SecurityService } from '@config/securities/security.service';
 import { InvalidCredentialsException } from '@common/exceptions/invalid-credentials.exception';
-import { TokenService } from '@config/securities/token.service';
 import { UserRole } from '@modules/users/enums/user-role.enum';
+import { CreateUserDto } from '@modules/users/dto';
+import { SecurityService, TokenService } from '@config/securities';
 
 /**
  * Service providing authentication functionality.
