@@ -6,28 +6,56 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AccessTokenGuard } from '@common/guards/access-token.guard';
 import { TokenService } from '@config/securities/token.service';
 
+/**
+ * Controller that handles authentication-related requests.
+ */
 @Controller('auth')
 export class AuthController {
+  /**
+   * Constructs the authentication controller.
+   *
+   * @param authService The service that handles authentication business logic.
+   * @param tokenService The service that handles token operations.
+   */
   constructor(
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
   ) { }
 
+  /**
+   * Endpoint for creating a new user account.
+   *
+   * @param createUserDto The data transfer object containing new user data.
+   * @returns A promise resolved to the created user.
+   */
   @Post('signup')
   create(@Body() createUserDto: CreateUserDto) {
     return this.authService.signup(createUserDto);
   }
 
+  /**
+   * Endpoint for authenticating a user and returning access and refresh tokens.
+   *
+   * @param loginDto The data transfer object containing user login credentials.
+   * @returns A promise resolved to an object containing JWT tokens.
+   */
   @Post('login')
   async login(@Body() loginDto: LoginDTO) {
     const { email, password } = loginDto;
     return await this.authService.login(email, password);
-
   }
 
+  /**
+   * Endpoint for refreshing the JWT access token using a refresh token.
+   * This endpoint is protected and requires a valid access token.
+   *
+   * @param refreshTokenDto The data transfer object containing the refresh token.
+   * @returns A promise resolved to a new set of access and refresh tokens.
+   */
   @UseGuards(AccessTokenGuard)
   @Post('/refresh-token')
   async refreshToken(@Body() { refreshToken }: RefreshTokenDto) {
     return await this.tokenService.refreshToken(refreshToken);
   }
 }
+

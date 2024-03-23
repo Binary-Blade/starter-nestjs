@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   # DATABASE - POSTGRESQL
-  # Choose your DB link to ENV
+  # Setup for the PostgreSQL database service
   postgres:
     container_name: db-postgres
     image: postgres:16-alpine
@@ -19,6 +19,7 @@ services:
       - app
 
   # SERVER - NESTJS
+  # Configuration for the NestJS server service.
   dev:
     container_name: nestjs-server
     build:
