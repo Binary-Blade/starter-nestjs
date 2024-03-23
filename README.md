@@ -58,7 +58,7 @@ git clone https://github.com/Binary-Blade/starter-nestjs.git
 cd your-repo-name
 ```
 
-2. Environment variables are provided in a .env file within the cloned repository. These include configurations for the database, JWT tokens, and the application environment. Here's an example of what's included:
+2. Environment variables are provided in a .env.example file within the cloned repository. These include configurations for the database, JWT tokens, and the application environment. Here's an example of what's included:
 ```env
 # Database Configuration
 DB_HOST=postgres                  # The hostname of the database server.
