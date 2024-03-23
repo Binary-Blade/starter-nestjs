@@ -39,7 +39,6 @@ test/
 └── users.e2e-spec.ts       # End-to-end tests for user management
 ```
 
-
 ## Getting Started
 
 This project is designed to get you up and running with a fully configured NestJS environment using Docker. It includes pre-configured `.env` files, Docker Compose, and Dockerfile setups, ensuring a smooth workflow from development to production.
@@ -78,7 +77,8 @@ JWT_REFRESH_TOKEN_EXPIRATION=30d         # The expiration time for JWT refresh t
 # Server Configuration
 PORT=3000                         # The port number on which the NestJS server will listen.
 # Environment
-NODE_ENV=development              # The environment in which the application is running. Use 'production' for production environments.```
+NODE_ENV=development              # The environment in which the application is running. Use 'production' for production environments.
+```
 
 Make sure to review and modify the .env file according to your development and production needs.
 
