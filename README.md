@@ -20,7 +20,7 @@ This NestJS Starter Kit is designed to serve as a foundation for building scalab
 
 ## Project Structure
 
-```
+```plaintext
 src/
 ├── common/ # Common module with guards, decorators, and exceptions
 ├── config/ # Configuration management, database and security settings
