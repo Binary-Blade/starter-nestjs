@@ -8,10 +8,9 @@ export class CreateUserDto {
   readonly email: string;
 
   @IsNotEmpty()
-  // NOTE: Remove it after testing that for production
-  // @IsStrongPassword()
+
+  @IsStrongPassword()
   readonly password: string;
 
   readonly role?: UserRole;
-
 }
