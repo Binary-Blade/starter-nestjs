@@ -21,6 +21,7 @@ describe('AuthController', () => {
           useValue: {
             signup: jest.fn(),
             login: jest.fn(),
+            logout: jest.fn(),
           },
         },
         {
@@ -66,6 +67,14 @@ describe('AuthController', () => {
       jest.spyOn(authService, 'login').mockImplementation(async () => ({} as any));
 
       await expect(controller.login(loginDto)).resolves.not.toThrow();
+    });
+  });
+
+  describe('logout', () => {
+    it('should log out a user', async () => {
+      jest.spyOn(authService, 'logout').mockImplementation(async () => ({} as any));
+
+      await expect(controller.logout({ user: { userId: 1 } })).resolves.not.toThrow();
     });
   });
 

@@ -6,7 +6,7 @@ import { SecurityService } from '@config/securities/security.service';
 import { TokenService } from '@config/securities/token.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
 
 describe('AuthService', () => {
@@ -21,7 +21,11 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: getRepositoryToken(User),
-          useClass: Repository,
+          useValue: {
+            findOneBy: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+          },
         },
         {
           provide: SecurityService,
@@ -34,6 +38,7 @@ describe('AuthService', () => {
           provide: TokenService,
           useValue: {
             getTokens: jest.fn(),
+            refreshToken: jest.fn(), // Assuming there's a method to refresh tokens
           },
         },
       ],
@@ -87,6 +92,29 @@ describe('AuthService', () => {
       jest.spyOn(tokenService, 'getTokens').mockResolvedValue(jwtTokens);
 
       expect(await authService.login(email, password)).toEqual(jwtTokens);
+    });
+  });
+
+  describe('logout', () => {
+    it('should increment tokenVersion for the user', async () => {
+      const userId = 1;
+      const user = new User();
+      user.userId = userId;
+      user.tokenVersion = 0;
+
+      jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(user);
+      jest.spyOn(usersRepository, 'save').mockImplementation(async (user: User) => {
+        return { ...user, tokenVersion: user.tokenVersion + 1 };
+      });
+
+      await authService.logout(userId);
+      expect(usersRepository.save).toHaveBeenCalledWith({ ...user, tokenVersion: 1 });
+    });
+
+    it('should throw a NotFoundException if user does not exist', async () => {
+      jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(null);
+
+      await expect(authService.logout(1)).rejects.toThrow(NotFoundException);
     });
   });
 
