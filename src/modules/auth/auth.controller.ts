@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { AccessTokenGuard } from '@common/guards/access-token.guard';
@@ -42,6 +42,19 @@ export class AuthController {
   async login(@Body() loginDto: LoginDTO) {
     const { email, password } = loginDto;
     return await this.authService.login(email, password);
+  }
+
+  /**
+   * Endpoint for logging out a user by invalidating their refresh token.
+   *
+   * @param  req The request object containing the user's ID.
+   * @returns A promise resolved to a message indicating successful logout.
+  */
+  @UseGuards(AccessTokenGuard)
+  @Post('logout')
+  async logout(@Req() req: any) {
+    await this.authService.logout(req.user.userId);
+    return { message: 'Logged out successfully' };
   }
 
   /**
