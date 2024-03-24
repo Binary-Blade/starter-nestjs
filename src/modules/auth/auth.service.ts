@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@modules/users/entities/user.entity';
@@ -72,5 +72,22 @@ export class AuthService {
     // Return the JWT tokens for the user
     return this.tokenService.getTokens(user);
   }
+
+
+  /**
+   * Handles user logout logic.
+   * @param  userId The ID of the user to log out.
+   * @returns A promise that resolves when the user is logged out.
+   */
+  async logout(userId: number): Promise<void> {
+    const user = await this.usersRepository.findOneBy({ userId });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    user.tokenVersion += 1; // Incrementing the tokenVersion invalidates previous tokens.
+    await this.usersRepository.save(user);
+
+  }
+
 }
 
