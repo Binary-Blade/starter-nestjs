@@ -11,7 +11,7 @@ export class InitialMigration1711085051379 implements MigrationInterface {
     /**
      * Run the migrations.
      * 
-     * Creates the "users" table with columns for user ID, email, password, and role.
+     * Creates the "users" table with columns for user ID, email, password, role and token version.
      * 
      * @param queryRunner The QueryRunner instance that allows manipulation of the database.
      */
@@ -21,7 +21,8 @@ export class InitialMigration1711085051379 implements MigrationInterface {
                     "userId" SERIAL PRIMARY KEY,
                     "email" VARCHAR NOT NULL,
                     "password" VARCHAR NOT NULL,
-                    "userRole" VARCHAR NOT NULL
+                    "userRole" VARCHAR NOT NULL,
+                    "tokenVersion" INTEGER DEFAULT 1,
                 );
             `);
     }
