@@ -19,6 +19,9 @@ export class User {
   @Column({ type: 'varchar', default: UserRole.USER, name: 'userRole' })
   role: UserRole;
 
+  @Column({ type: 'int', default: 1 })
+  tokenVersion: number;
+
   // @OneToMany(() => Task, (task) => task.user)
   // tasks: Task[];
 }

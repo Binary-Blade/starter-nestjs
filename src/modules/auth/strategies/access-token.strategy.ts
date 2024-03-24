@@ -38,13 +38,11 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
    * @throws UnauthorizedException if the user cannot be found or the token is invalid.
    */
   async validate(payload: JwtPayload): Promise<User> {
-    // Extract the user ID (subject) from the JWT payload
-    const userId = payload.sub;
     // Look for the user associated with the user ID from the payload
-    const user = await this.usersRepository.findOne({ where: { userId } });
+    const user = await this.usersRepository.findOne({ where: { userId: payload.sub } });
     // If no user is found, throw an UnauthorizedException
-    if (!user) {
-      throw new UnauthorizedException();
+    if (!user || user.tokenVersion !== payload.version) {
+      throw new UnauthorizedException('Token has been invalidated');
     }
     // Return the user object for request property attachment if validation passes
     return user;
