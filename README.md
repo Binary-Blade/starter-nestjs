@@ -92,6 +92,8 @@ docker-compose up -d
 
 This command will spin up the PostgreSQL database service and the NestJS application in development mode. The application will watch for file changes and will restart automatically, reflecting any updates you make to the code.
 
+Feel free to dive into the Dockerfile and docker-compose.yml files to understand the container setup or to make any necessary customizations to fit your project's requirements.
+
 ## Running Migrations
 Migrations manage your database schema evolution. Create and run migrations using the provided Make commands:
 
@@ -122,4 +124,19 @@ make test
 
 This will run the Jest test suite inside the Dockerized development environment.
 
-Feel free to dive into the Dockerfile and docker-compose.yml files to understand the container setup or to make any necessary customizations to fit your project's requirements.
+## Security Considerations
+
+To maintain the security integrity of your application, adhere to the following practices:
+
+- Securely manage JWT secrets and database credentials using environment variables.
+- Regularly update dependencies to mitigate vulnerabilities.
+- Implement rate limiting and CORS policies to protect against common attack vectors.
+
+
+## Contribution
+
+Contributions are welcome! Please feel free to submit pull requests or open issues to discuss proposed changes or enhancements.
+
+## License
+
+This project is open-sourced under the MIT License. See the LICENSE file for more details.
