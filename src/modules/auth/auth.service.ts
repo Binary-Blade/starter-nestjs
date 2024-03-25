@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { User } from '@modules/users/entities/user.entity';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
 import { InvalidCredentialsException } from '@common/exceptions/invalid-credentials.exception';
-import { UserRole } from '@modules/users/enums/user-role.enum';
 import { CreateUserDto } from '@modules/users/dto';
 import { SecurityService, TokenService } from '@config/securities';
+import { UserRole } from '@modules/users/enums/user-role.enum';
 
 /**
  * Service providing authentication functionality.
@@ -73,7 +73,6 @@ export class AuthService {
     return this.tokenService.getTokens(user);
   }
 
-
   /**
    * Handles user logout logic.
    * @param  userId The ID of the user to log out.
@@ -86,8 +85,5 @@ export class AuthService {
     }
     user.tokenVersion += 1; // Incrementing the tokenVersion invalidates previous tokens.
     await this.usersRepository.save(user);
-
   }
-
 }
-
