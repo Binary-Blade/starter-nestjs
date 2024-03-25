@@ -58,7 +58,14 @@ git clone https://github.com/Binary-Blade/starter-nestjs.git
 cd your-repo-name
 ```
 
-2. Environment variables are provided in a .env.example file within the cloned repository. These include configurations for the database, JWT tokens, and the application environment. Here's an example of what's included:
+2. Install the dependencies:
+
+```bash
+pnpm install
+```
+
+
+3. Environment variables are provided in a .env.example file within the cloned repository. These include configurations for the database, JWT tokens, and the application environment. Here's an example of what's included:
 ```env
 # Database Configuration
 DB_HOST=postgres                  # The hostname of the database server.
@@ -82,7 +89,7 @@ NODE_ENV=development              # The environment in which the application is 
 
 Make sure to review and modify the .env file according to your development and production needs.
 
-3. Start the Development Environment:
+4. Start the Development Environment:
 
 With Docker Compose, you can spin up the application and its dependencies easily:
 
