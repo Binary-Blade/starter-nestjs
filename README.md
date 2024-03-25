@@ -65,7 +65,11 @@ pnpm install
 ```
 
 
-3. Environment variables are provided in a .env.example file within the cloned repository. These include configurations for the database, JWT tokens, and the application environment. Here's an example of what's included:
+3. Rename .env.example to .env for base starting:
+
+Setting Environment variables are provided in a .env.example file within the cloned repository.
+These include configurations for the database, JWT tokens, and the application environment. 
+
 ```env
 # Database Configuration
 DB_HOST=postgres                  # The hostname of the database server.
