@@ -8,6 +8,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
  * managing user data within the application.
  */
 export class InitialMigration1711085051379 implements MigrationInterface {
+
     /**
      * Run the migrations.
      * 
@@ -16,7 +17,11 @@ export class InitialMigration1711085051379 implements MigrationInterface {
      * @param queryRunner The QueryRunner instance that allows manipulation of the database.
      */
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+        // Check if the "users" table already exists in the database.
+        const table = await queryRunner.getTable("users");
+        // If the table doesn't exist, create it with the specified columns.
+        if (!table) {
+            await queryRunner.query(`
                 CREATE TABLE "users" (
                     "userId" SERIAL PRIMARY KEY,
                     "email" VARCHAR NOT NULL,
@@ -27,6 +32,7 @@ export class InitialMigration1711085051379 implements MigrationInterface {
                     "lastLogin" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `);
+        }
     }
 
     /**
