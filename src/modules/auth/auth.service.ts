@@ -70,6 +70,9 @@ export class AuthService {
     if (!validPassword) {
       throw new InvalidCredentialsException();
     }
+    user.lastLogin = new Date();
+    // Save the user's last login date
+    await this.usersRepository.save(user);
     // Return the JWT tokens for the user
     return this.tokenService.getTokens(user);
   }
