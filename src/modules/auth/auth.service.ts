@@ -46,6 +46,7 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
       role,
+      createdAt: new Date(),
     });
     // Save the new user to the database
     return this.usersRepository.save(newUser);

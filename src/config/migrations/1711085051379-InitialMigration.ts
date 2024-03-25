@@ -23,6 +23,7 @@ export class InitialMigration1711085051379 implements MigrationInterface {
                     "password" VARCHAR NOT NULL,
                     "userRole" VARCHAR NOT NULL,
                     "tokenVersion" INTEGER DEFAULT 1,
+                    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `);
     }
