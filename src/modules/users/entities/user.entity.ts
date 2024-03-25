@@ -19,6 +19,7 @@ export class User {
   @Column({ type: 'varchar', default: UserRole.USER, name: 'userRole' })
   role: UserRole;
 
+  @Exclude()
   @Column({ type: 'int', default: 1 })
   tokenVersion: number;
 
