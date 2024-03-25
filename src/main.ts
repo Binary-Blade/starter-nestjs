@@ -16,6 +16,12 @@ async function bootstrap() {
   // Retrieve the ConfigService instance to access environment variables and application configuration.
   const configService = app.get(ConfigService);
 
+  // Enable CORS for the frontend app to access the API.
+  app.enableCors({
+    origin: 'http://localhost:5173', // Allow requests from this origin (frontend app) using vite dev server
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
+    allowedHeaders: 'Content-Type, Accept', // Allow these headers
+  });
   // Use helmet middleware for setting various HTTP headers to secure the app.
   app.use(helmet());
   // Use a global validation pipe for automatically validating DTOs (Data Transfer Objects).
