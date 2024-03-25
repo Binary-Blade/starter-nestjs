@@ -9,7 +9,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
 
-  @IsStrongPassword()
+  //@IsStrongPassword()
   readonly password: string;
 
   readonly role?: UserRole;
