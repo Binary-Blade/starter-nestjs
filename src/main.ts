@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/globals-filter/http-exceptions-filter';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
@@ -28,6 +28,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   // Use a global exception filter for handling HTTP exceptions in a standardized way.
   app.useGlobalFilters(new HttpExceptionFilter(configService));
+  // Use a global class serializer interceptor for automatically serializing responses.
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // Optionally, run database migrations automatically on application startup.
   // This line is commented out by default. Uncomment it to enable automatic migration on startup.
