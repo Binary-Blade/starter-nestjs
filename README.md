@@ -110,7 +110,13 @@ Migrations manage your database schema evolution. Create and run migrations usin
 
 - Create a new migration:
 ```bash
-name=your-migration-name pnpm run migration:create
+make migrate-create
+```
+This command will ask for the migration name interactively.
+
+```bash
+Enter migration name: <migration-name>
+
 ```
 
 - Run pending migrations:

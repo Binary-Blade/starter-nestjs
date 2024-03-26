@@ -1,4 +1,9 @@
-.PHONY: migrate-run migrate-revert test
+.PHONY: migrate-create migrate-run migrate-revert test
+
+# Create a new migration
+migrate-create:
+	@read -p "Enter migration name: " name; \
+	name=$$name pnpm run migration:create 
 
 # Run migrations
 migrate-run:
