@@ -48,7 +48,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    Object.assign(user, updateUserDto);
+    this.usersRepository.merge(user, updateUserDto);
     return this.usersRepository.save(user);
   }
 
