@@ -15,6 +15,7 @@ describe('UsersService', () => {
       find: jest.fn(),
       findOneBy: jest.fn(),
       save: jest.fn(),
+      merge: jest.fn(),
       remove: jest.fn(),
     };
 
@@ -63,13 +64,19 @@ describe('UsersService', () => {
       const user = new User(); // Adjust with actual user entity properties if necessary
 
       mockUsersRepository.findOneBy.mockResolvedValue(user);
+      mockUsersRepository.merge.mockImplementation((user, dto) => ({ ...user, ...dto }));
       mockUsersRepository.save.mockResolvedValue(user);
 
-      expect(await service.update(userId, updateUserDto)).toEqual(user);
+      await expect(service.update(userId, updateUserDto)).resolves.toEqual(user);
+
+      expect(mockUsersRepository.merge).toHaveBeenCalledWith(user, updateUserDto);
+
+      expect(mockUsersRepository.save).toHaveBeenCalledWith(user);
     });
 
     it('should throw NotFoundException if user not found', async () => {
       mockUsersRepository.findOneBy.mockResolvedValue(undefined);
+
       await expect(service.update(1, new UpdateUserDto())).rejects.toThrow(NotFoundException);
     });
   });
