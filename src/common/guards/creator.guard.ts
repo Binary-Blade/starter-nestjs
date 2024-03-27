@@ -7,27 +7,26 @@ import { Reflector } from '@nestjs/core';
  */
 @Injectable()
 export class CreatorGuard implements CanActivate {
-	constructor(private reflector: Reflector) { }
+  constructor(private reflector: Reflector) {}
 
-	/**
-	 * Determines if the current user is authorized to proceed with the request.
-	 * @param context The execution context containing the request data.
-	 * @returns A boolean indicating whether the user is authorized.
-	 */
-	canActivate(context: ExecutionContext): boolean {
-		const request = context.switchToHttp().getRequest();
-		const user = request.user;
-		const contentOwnerId = +request.params.id;
+  /**
+   * Determines if the current user is authorized to proceed with the request.
+   * @param context The execution context containing the request data.
+   * @returns A boolean indicating whether the user is authorized.
+   */
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    const contentOwnerId = +request.params.id;
 
-		// Check if the current user ID matches the content owner's ID.
-		const isCreator = user && user.userId === contentOwnerId;
-		if (!isCreator) {
-			throw new NotFoundException(`Content not found or access unauthorized.`);
-		}
+    // Check if the current user ID matches the content owner's ID.
+    const isCreator = user && user.userId === contentOwnerId;
+    if (!isCreator) {
+      throw new NotFoundException(`Content not found or access unauthorized.`);
+    }
 
-		// Optionally add isCreator flag to the request object for further use.
-		request.isCreator = isCreator;
-		return true;
-	}
+    // Optionally add isCreator flag to the request object for further use.
+    request.isCreator = isCreator;
+    return true;
+  }
 }
-

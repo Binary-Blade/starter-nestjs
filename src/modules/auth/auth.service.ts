@@ -23,8 +23,8 @@ export class AuthService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private securityService: SecurityService,
-    private tokenService: TokenService,
-  ) { }
+    private tokenService: TokenService
+  ) {}
 
   /**
    * Handles user signup logic.
@@ -46,7 +46,7 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
       role,
-      createdAt: new Date(),
+      createdAt: new Date()
     });
     // Save the new user to the database
     return this.usersRepository.save(newUser);

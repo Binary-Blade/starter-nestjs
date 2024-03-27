@@ -21,20 +21,20 @@ describe('AuthController', () => {
           useValue: {
             signup: jest.fn(),
             login: jest.fn(),
-            logout: jest.fn(),
-          },
+            logout: jest.fn()
+          }
         },
         {
           provide: TokenService,
           useValue: {
-            refreshToken: jest.fn(),
-          },
+            refreshToken: jest.fn()
+          }
         },
         {
           provide: AccessTokenGuard,
-          useValue: { canActivate: jest.fn(() => true) },
-        },
-      ],
+          useValue: { canActivate: jest.fn(() => true) }
+        }
+      ]
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -50,9 +50,9 @@ describe('AuthController', () => {
     it('should sign up a user', async () => {
       const createUserDto: CreateUserDto = {
         email: 'test@example.com',
-        password: 'password123',
+        password: 'password123'
       };
-      jest.spyOn(authService, 'signup').mockImplementation(async () => ({} as any));
+      jest.spyOn(authService, 'signup').mockImplementation(async () => ({}) as any);
 
       await expect(controller.create(createUserDto)).resolves.not.toThrow();
     });
@@ -62,9 +62,9 @@ describe('AuthController', () => {
     it('should log in a user', async () => {
       const loginDto: LoginDTO = {
         email: 'test@example.com',
-        password: 'password123',
+        password: 'password123'
       };
-      jest.spyOn(authService, 'login').mockImplementation(async () => ({} as any));
+      jest.spyOn(authService, 'login').mockImplementation(async () => ({}) as any);
 
       await expect(controller.login(loginDto)).resolves.not.toThrow();
     });
@@ -72,7 +72,7 @@ describe('AuthController', () => {
 
   describe('logout', () => {
     it('should log out a user', async () => {
-      jest.spyOn(authService, 'logout').mockImplementation(async () => ({} as any));
+      jest.spyOn(authService, 'logout').mockImplementation(async () => ({}) as any);
 
       await expect(controller.logout({ user: { userId: 1 } })).resolves.not.toThrow();
     });
@@ -81,10 +81,9 @@ describe('AuthController', () => {
   describe('refreshToken', () => {
     it('should refresh the access token', async () => {
       const refreshTokenDto: RefreshTokenDto = { refreshToken: 'some-refresh-token' };
-      jest.spyOn(tokenService, 'refreshToken').mockImplementation(async () => ({} as any));
+      jest.spyOn(tokenService, 'refreshToken').mockImplementation(async () => ({}) as any);
 
       await expect(controller.refreshToken(refreshTokenDto)).resolves.not.toThrow();
     });
   });
 });
-

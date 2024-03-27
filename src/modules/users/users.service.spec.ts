@@ -16,7 +16,7 @@ describe('UsersService', () => {
       findOneBy: jest.fn(),
       save: jest.fn(),
       merge: jest.fn(),
-      remove: jest.fn(),
+      remove: jest.fn()
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -24,9 +24,9 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: getRepositoryToken(User),
-          useValue: mockUsersRepository,
-        },
-      ],
+          useValue: mockUsersRepository
+        }
+      ]
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -97,4 +97,3 @@ describe('UsersService', () => {
     });
   });
 });
-

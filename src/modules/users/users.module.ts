@@ -8,13 +8,13 @@ import { SecurityService } from '@config/securities/security.service';
 import { AccessTokenStrategy } from '../auth/strategies/access-token.strategy';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])], // Registers the User entity for TypeORM 
+  imports: [TypeOrmModule.forFeature([User])], // Registers the User entity for TypeORM
   controllers: [UsersController], // The controllers that are part of this module
   providers: [
     UsersService, // The service responsible for user-related operations
     SecurityService, // A service for handling common security tasks such as hashing
     JwtService, // Nest's JwtService for JWT operations such as signing and verification
-    AccessTokenStrategy // AccessTokenStrategy implements JWT validation logic for Passport.
+    AccessTokenStrategy, // AccessTokenStrategy implements JWT validation logic for Passport.
   ],
 })
-export class UsersModule { }
+export class UsersModule {}

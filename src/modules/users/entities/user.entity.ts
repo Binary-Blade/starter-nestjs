@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserRole } from '../enums/user-role.enum';
 
-
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('increment')

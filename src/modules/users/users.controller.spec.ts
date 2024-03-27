@@ -22,7 +22,7 @@ describe('UsersController', () => {
             findOne: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
-          }
+          },
         },
         {
           provide: AccessTokenGuard,

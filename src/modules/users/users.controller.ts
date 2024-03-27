@@ -13,7 +13,7 @@ import { AccessTokenGuard, CreatorGuard, RoleGuard } from '@common/guards';
 @UseGuards(AccessTokenGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   /**
    * Fetches all users. This operation is restricted to admins.

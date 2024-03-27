@@ -24,24 +24,24 @@ describe('AuthService', () => {
           useValue: {
             findOneBy: jest.fn(),
             create: jest.fn(),
-            save: jest.fn(),
-          },
+            save: jest.fn()
+          }
         },
         {
           provide: SecurityService,
           useValue: {
             hashPassword: jest.fn(),
-            verifyPassword: jest.fn(),
-          },
+            verifyPassword: jest.fn()
+          }
         },
         {
           provide: TokenService,
           useValue: {
             getTokens: jest.fn(),
-            refreshToken: jest.fn(), // Assuming there's a method to refresh tokens
-          },
-        },
-      ],
+            refreshToken: jest.fn() // Assuming there's a method to refresh tokens
+          }
+        }
+      ]
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
@@ -58,7 +58,7 @@ describe('AuthService', () => {
     it('should sign up a new user', async () => {
       const createUserDto: CreateUserDto = {
         email: 'test@example.com',
-        password: 'strongpassword',
+        password: 'strongpassword'
       };
       const user: User = new User();
       jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(null);
@@ -72,7 +72,7 @@ describe('AuthService', () => {
     it('should throw an error if email already exists', async () => {
       const createUserDto: CreateUserDto = {
         email: 'test@example.com',
-        password: 'strongpassword',
+        password: 'strongpassword'
       };
       const user: User = new User();
       jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(user);
@@ -117,5 +117,4 @@ describe('AuthService', () => {
       await expect(authService.logout(1)).rejects.toThrow(NotFoundException);
     });
   });
-
 });

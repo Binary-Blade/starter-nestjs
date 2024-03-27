@@ -1,5 +1,5 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 
 /**
@@ -8,37 +8,36 @@ import { Request, Response } from 'express';
  */
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-	private readonly logger = new Logger(HttpExceptionFilter.name);
+  private readonly logger = new Logger(HttpExceptionFilter.name);
 
-	constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
-	/**
-	 * Method to catch and handle HTTP exceptions.
-	 * @param exception The caught HttpException.
-	 * @param host The arguments host containing information about the request context.
-	 */
-	catch(exception: HttpException, host: ArgumentsHost) {
-		const ctx = host.switchToHttp();
-		const response = ctx.getResponse<Response>();
-		const request = ctx.getRequest<Request>();
-		const status = exception.getStatus();
+  /**
+   * Method to catch and handle HTTP exceptions.
+   * @param exception The caught HttpException.
+   * @param host The arguments host containing information about the request context.
+   */
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    const status = exception.getStatus();
 
-		// Construct the error response object.
-		const errorResponse = {
-			statusCode: status,
-			timestamp: new Date().toISOString(),
-			message: exception.message || null,
-		};
+    // Construct the error response object.
+    const errorResponse = {
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      message: exception.message || null
+    };
 
-		// Include additional debugging information in non-production environments.
-		if (this.configService.get<string>('NODE_ENV') !== 'production') {
-			errorResponse['path'] = request.url;
-			errorResponse['method'] = request.method;
-			errorResponse['stack'] = exception.stack;
-		}
+    // Include additional debugging information in non-production environments.
+    if (this.configService.get<string>('NODE_ENV') !== 'production') {
+      errorResponse['path'] = request.url;
+      errorResponse['method'] = request.method;
+      errorResponse['stack'] = exception.stack;
+    }
 
-		this.logger.error(`Http Status: ${status}, Exception Message: ${exception.message}`);
-		response.status(status).json(errorResponse);
-	}
+    this.logger.error(`Http Status: ${status}, Exception Message: ${exception.message}`);
+    response.status(status).json(errorResponse);
+  }
 }
-

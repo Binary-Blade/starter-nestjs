@@ -13,7 +13,7 @@ import { UsersModule } from '@modules/users/users.module';
     // Global configuration module that loads environment variables.
     ConfigModule.forRoot({
       envFilePath: './.env',
-      isGlobal: true,
+      isGlobal: true
     }),
     // Asynchronous database module initialization with configurations from the ConfigModule.
     TypeOrmModule.forRootAsync({
@@ -27,13 +27,12 @@ import { UsersModule } from '@modules/users/users.module';
         password: config.get<string>('DB_PASSWORD'), // Database password.
         database: config.get<string>('DB_NAME'), // Database name.
         synchronize: config.get<boolean>('DB_SYNCHRONIZE'), // Auto-sync database schema.
-        entities: [__dirname + '/**/*.entity{.ts,.js}'], // Entities path.
-      }),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'] // Entities path.
+      })
     }),
     // Feature modules.
     AuthModule,
-    UsersModule,
-  ],
+    UsersModule
+  ]
 })
-export class AppModule { }
-
+export class AppModule {}

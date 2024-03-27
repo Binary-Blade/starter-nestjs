@@ -11,8 +11,8 @@ import { UpdateUserDto } from './dto';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) { }
+    private usersRepository: Repository<User>
+  ) {}
 
   /**
    * Finds all users.
@@ -65,4 +65,3 @@ export class UsersService {
     await this.usersRepository.remove(user);
   }
 }
-

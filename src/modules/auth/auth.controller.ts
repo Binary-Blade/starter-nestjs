@@ -18,8 +18,8 @@ export class AuthController {
    */
   constructor(
     private readonly authService: AuthService,
-    private readonly tokenService: TokenService,
-  ) { }
+    private readonly tokenService: TokenService
+  ) {}
 
   /**
    * Endpoint for creating a new user account.
@@ -49,7 +49,7 @@ export class AuthController {
    *
    * @param  req The request object containing the user's ID.
    * @returns A promise resolved to a message indicating successful logout.
-  */
+   */
   @UseGuards(AccessTokenGuard)
   @Post('logout')
   async logout(@Req() req: any) {
@@ -70,4 +70,3 @@ export class AuthController {
     return await this.tokenService.refreshToken(refreshToken);
   }
 }
-

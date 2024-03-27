@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 
 /**
@@ -8,7 +8,7 @@ import * as argon2 from 'argon2';
 export class SecurityService {
   /**
    * Hashes a plaintext password using the Argon2 algorithm.
-   * 
+   *
    * @param password The plaintext password to hash.
    * @returns A promise that resolves to the hashed password.
    */
@@ -18,7 +18,7 @@ export class SecurityService {
 
   /**
    * Verifies a plaintext password against a given hash.
-   * 
+   *
    * @param hash The hash to verify against.
    * @param password The plaintext password to verify.
    * @returns A promise that resolves to a boolean indicating if the password matches the hash.
@@ -27,4 +27,3 @@ export class SecurityService {
     return argon2.verify(hash, password);
   }
 }
-
