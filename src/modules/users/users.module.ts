@@ -12,9 +12,7 @@ import { AccessTokenStrategy } from '../auth/strategies/access-token.strategy';
   controllers: [UsersController], // The controllers that are part of this module
   providers: [
     UsersService, // The service responsible for user-related operations
-    SecurityService, // A service for handling common security tasks such as hashing
-    JwtService, // Nest's JwtService for JWT operations such as signing and verification
-    AccessTokenStrategy, // AccessTokenStrategy implements JWT validation logic for Passport.
-  ],
+    AccessTokenStrategy // AccessTokenStrategy implements JWT validation logic for Passport.
+  ]
 })
 export class UsersModule {}
