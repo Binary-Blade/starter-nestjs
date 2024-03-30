@@ -18,9 +18,9 @@ async function bootstrap() {
 
   // Enable CORS for the frontend app to access the API.
   app.enableCors({
-    origin: 'http://localhost:5173', // Allow requests from this origin (frontend app) using vite dev server
+    origin: configService.get('FRONTEND_URL'), // Allow requests from this origin (frontend app) using vite dev server
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
-    allowedHeaders: 'Content-Type, Accept', // Allow these headers
+    allowedHeaders: 'Content-Type, Accept' // Allow these headers
   });
   // Use helmet middleware for setting various HTTP headers to secure the app.
   app.use(helmet());
