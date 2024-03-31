@@ -24,7 +24,7 @@ export class InitialMigration1711085051379 implements MigrationInterface {
                 CREATE TABLE "users" (
                     "userId" SERIAL PRIMARY KEY,
                     "email" VARCHAR NOT NULL,
-                    "password" VARCHAR NOT NULL,
+                    "passwordHash" VARCHAR NOT NULL,
                     "userRole" VARCHAR NOT NULL,
                     "tokenVersion" INTEGER DEFAULT 1,
                     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
