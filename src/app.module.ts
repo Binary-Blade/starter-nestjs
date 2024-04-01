@@ -26,7 +26,7 @@ import { UsersModule } from '@modules/users/users.module';
         username: config.get<string>('DB_USERNAME'), // Database username.
         password: config.get<string>('DB_PASSWORD'), // Database password.
         database: config.get<string>('DB_NAME'), // Database name.
-        synchronize: config.get<boolean>('DB_SYNCHRONIZE'), // Auto-sync database schema.
+        synchronize: false, // Auto-sync database schema if set to true. NOTE: Switch to true in production mode
         entities: [__dirname + '/**/*.entity{.ts,.js}'] // Entities path.
       })
     }),

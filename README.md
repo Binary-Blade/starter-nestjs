@@ -77,7 +77,6 @@ DB_PORT=5432                      # The port number on which the database server
 DB_NAME=dev                       # The name of the database to connect to.
 DB_USERNAME=admin-db              # The username used for the database connection.
 DB_PASSWORD=password              # The password used for the database connection.
-DB_SYNCHRONIZE=true               # Controls whether the database schema should be auto-created on every application launch. Use with caution in production!
 
 # JWT Configuration
 JWT_ACCESS_TOKEN_SECRET=secret-key       # The secret key for signing JWT access tokens.
