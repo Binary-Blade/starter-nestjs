@@ -5,7 +5,7 @@ import * as argon2 from 'argon2';
  * Provides security utilities for password hashing and verification.
  */
 @Injectable()
-export class SecurityService {
+export class EncryptionService {
   /**
    * Hashes a plaintext password using the Argon2 algorithm.
    *
