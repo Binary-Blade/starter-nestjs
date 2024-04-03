@@ -4,8 +4,8 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { LoginDTO } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { TokenService } from '@config/securities/token.service';
 import { AccessTokenGuard } from '@common/guards/access-token.guard';
+import { TokenService } from '@config/security';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -72,9 +72,10 @@ describe('AuthController', () => {
 
   describe('logout', () => {
     it('should log out a user', async () => {
+      const userId = 1;
       jest.spyOn(authService, 'logout').mockImplementation(async () => ({}) as any);
 
-      await expect(controller.logout({ user: { userId: 1 } })).resolves.not.toThrow();
+      await expect(controller.logout(userId)).resolves.not.toThrow();
     });
   });
 

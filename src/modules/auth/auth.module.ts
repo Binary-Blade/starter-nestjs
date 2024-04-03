@@ -5,8 +5,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { TokenService } from '@config/securities/token.service';
-import { SecurityService } from '@config/securities/security.service';
+import { EncryptionService, TokenService } from '@config/security';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])], // Registers the User entity for TypeORM
@@ -16,7 +15,7 @@ import { SecurityService } from '@config/securities/security.service';
     UsersService, // The service responsible for user-related operations
     TokenService, // The service responsible for handling token-related operations
     JwtService, // Nest's JwtService for JWT operations such as signing and verification
-    SecurityService // A service for handling common security tasks such as hashing
+    EncryptionService // A service for handling common security tasks such as hashing
   ]
 })
 export class AuthModule {}

@@ -2,17 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
-import { SecurityService } from '@config/securities/security.service';
-import { TokenService } from '@config/securities/token.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
+import { EncryptionService, TokenService } from '@config/security';
+import { CreateUserDto } from '@modules/users/dto';
 
 describe('AuthService', () => {
   let authService: AuthService;
   let usersRepository: Repository<User>;
-  let securityService: SecurityService;
+  let encryptionService: EncryptionService;
   let tokenService: TokenService;
 
   beforeEach(async () => {
@@ -28,7 +27,7 @@ describe('AuthService', () => {
           }
         },
         {
-          provide: SecurityService,
+          provide: EncryptionService,
           useValue: {
             hashPassword: jest.fn(),
             verifyPassword: jest.fn()
@@ -46,7 +45,7 @@ describe('AuthService', () => {
 
     authService = module.get<AuthService>(AuthService);
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
-    securityService = module.get<SecurityService>(SecurityService);
+    encryptionService = module.get<EncryptionService>(EncryptionService);
     tokenService = module.get<TokenService>(TokenService);
   });
 
@@ -62,7 +61,7 @@ describe('AuthService', () => {
       };
       const user: User = new User();
       jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(null);
-      jest.spyOn(securityService, 'hashPassword').mockResolvedValue('hashedpassword');
+      jest.spyOn(encryptionService, 'hashPassword').mockResolvedValue('hashedpassword');
       jest.spyOn(usersRepository, 'create').mockReturnValue(user);
       jest.spyOn(usersRepository, 'save').mockResolvedValue(user);
 
@@ -88,7 +87,7 @@ describe('AuthService', () => {
       const user: User = new User();
       const jwtTokens: JWTTokens = { token: 'access-token', refreshToken: 'refresh-token' };
       jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(user);
-      jest.spyOn(securityService, 'verifyPassword').mockResolvedValue(true);
+      jest.spyOn(encryptionService, 'verifyPassword').mockResolvedValue(true);
       jest.spyOn(tokenService, 'getTokens').mockResolvedValue(jwtTokens);
 
       expect(await authService.login(email, password)).toEqual(jwtTokens);

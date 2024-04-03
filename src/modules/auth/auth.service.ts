@@ -5,8 +5,8 @@ import { User } from '@modules/users/entities/user.entity';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
 import { InvalidCredentialsException } from '@common/exceptions/invalid-credentials.exception';
 import { CreateUserDto } from '@modules/users/dto';
-import { SecurityService, TokenService } from '@config/securities';
 import { UserRole } from '@modules/users/enums/user-role.enum';
+import { EncryptionService, TokenService } from '@config/security';
 
 /**
  * Service providing authentication functionality.
@@ -16,13 +16,13 @@ export class AuthService {
   /**
    * AuthService constructor.
    * @param usersRepository The TypeORM repository for User entities.
-   * @param securityService The service handling security concerns such as hashing.
+   * @param encryptionService The service handling security concerns such as hashing.
    * @param tokenService The service responsible for managing JWT tokens.
    */
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private securityService: SecurityService,
+    private encryptionService: EncryptionService,
     private tokenService: TokenService
   ) {}
 
@@ -40,7 +40,7 @@ export class AuthService {
       throw new UnauthorizedException('Email already exists');
     }
     // Hash the user's password
-    const hashedPassword = await this.securityService.hashPassword(createUserDto.password);
+    const hashedPassword = await this.encryptionService.hashPassword(createUserDto.password);
     // Create a new user with the hashed password and the role
     const newUser = this.usersRepository.create({
       ...createUserDto,
@@ -66,7 +66,7 @@ export class AuthService {
       throw new InvalidCredentialsException();
     }
     // Verify the provided password against the hashed password
-    const validPassword = await this.securityService.verifyPassword(user.password, password);
+    const validPassword = await this.encryptionService.verifyPassword(user.password, password);
     if (!validPassword) {
       throw new InvalidCredentialsException();
     }
