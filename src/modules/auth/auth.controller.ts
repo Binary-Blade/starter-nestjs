@@ -4,6 +4,7 @@ import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { AccessTokenGuard } from '@common/guards/access-token.guard';
 import { TokenService } from '@config/securities/token.service';
 import { LoginDTO, RefreshTokenDto } from './dto';
+import { UserId } from '@common/decorators/user-id.decorator';
 
 /**
  * Controller that handles authentication-related requests.
@@ -52,8 +53,8 @@ export class AuthController {
    */
   @UseGuards(AccessTokenGuard)
   @Post('logout')
-  async logout(@Req() req: any) {
-    await this.authService.logout(req.user.userId);
+  async logout(@UserId() userId: number) {
+    await this.authService.logout(userId);
     return { message: 'Logged out successfully' };
   }
 
