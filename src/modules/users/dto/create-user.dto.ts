@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsStrongPassword } from 'class-validator';
 import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserDto {
@@ -11,5 +11,6 @@ export class CreateUserDto {
   //@IsStrongPassword()
   readonly password: string;
 
+  @IsEnum(UserRole)
   readonly role?: UserRole;
 }

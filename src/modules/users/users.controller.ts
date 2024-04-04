@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { Role } from '@common/decorators/role.decorator';
 import { UserRole } from './enums/user-role.enum';
 import { UpdateUserDto } from './dto';
-import { AccessTokenGuard, CreatorGuard, RoleGuard } from '@common/guards';
+import { AccessTokenGuard, IsCreatorGuard, RoleGuard } from '@common/guards';
 
 /**
  * Controller that manages user operations. It includes endpoints for fetching,
@@ -31,7 +31,7 @@ export class UsersController {
    * @param id The ID of the user to fetch.
    * @returns The requested user entity.
    */
-  @UseGuards(CreatorGuard)
+  @UseGuards(IsCreatorGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
@@ -43,7 +43,7 @@ export class UsersController {
    * @param updateUserDto The updated user data.
    * @returns The updated user entity.
    */
-  @UseGuards(CreatorGuard)
+  @UseGuards(IsCreatorGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
@@ -53,7 +53,7 @@ export class UsersController {
    * Deletes a user. Access is restricted to the user themself or an admin.
    * @param id The ID of the user to delete.
    */
-  @UseGuards(CreatorGuard)
+  @UseGuards(IsCreatorGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

@@ -1,3 +1,3 @@
 export { RoleGuard } from './role.guard';
-export { CreatorGuard } from './creator.guard';
+export { IsCreatorGuard } from './is-creator.guard';
 export { AccessTokenGuard } from './access-token.guard';

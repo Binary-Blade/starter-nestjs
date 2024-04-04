@@ -6,7 +6,7 @@ import { Reflector } from '@nestjs/core';
  * they are attempting to access or modify.
  */
 @Injectable()
-export class CreatorGuard implements CanActivate {
+export class IsCreatorGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   /**
