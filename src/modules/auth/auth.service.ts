@@ -35,7 +35,9 @@ export class AuthService {
    */
   async signup(createUserDto: CreateUserDto, role: UserRole = UserRole.USER): Promise<User> {
     // Check for existing user with the same email
-    const existingUser = await this.usersRepository.findOneBy({ email: createUserDto.email });
+    const existingUser = await this.usersRepository.findOneBy({
+      email: createUserDto.email
+    });
     if (existingUser) {
       throw new UnauthorizedException('Email already exists');
     }
@@ -70,8 +72,8 @@ export class AuthService {
     if (!validPassword) {
       throw new InvalidCredentialsException();
     }
-    user.lastLogin = new Date();
     // Save the user's last login date
+    user.lastLogin = new Date();
     await this.usersRepository.save(user);
     // Return the JWT tokens for the user
     return this.tokenService.getTokens(user);
