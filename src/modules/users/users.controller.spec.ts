@@ -5,7 +5,7 @@ import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccessTokenGuard } from '@common/guards/access-token.guard';
 import { RoleGuard } from '@common/guards/role.guard';
-import { CreatorGuard } from '@common/guards/creator.guard';
+import { IsCreatorGuard } from '@common/guards/is-creator.guard';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -21,22 +21,22 @@ describe('UsersController', () => {
             findAll: jest.fn(),
             findOne: jest.fn(),
             update: jest.fn(),
-            remove: jest.fn(),
-          },
+            remove: jest.fn()
+          }
         },
         {
           provide: AccessTokenGuard,
-          useValue: { canActivate: jest.fn(() => true) },
+          useValue: { canActivate: jest.fn(() => true) }
         },
         {
           provide: RoleGuard,
-          useValue: { canActivate: jest.fn(() => true) },
+          useValue: { canActivate: jest.fn(() => true) }
         },
         {
-          provide: CreatorGuard,
-          useValue: { canActivate: jest.fn(() => true) },
-        },
-      ],
+          provide: IsCreatorGuard,
+          useValue: { canActivate: jest.fn(() => true) }
+        }
+      ]
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
