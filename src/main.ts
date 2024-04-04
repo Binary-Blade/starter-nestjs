@@ -1,39 +1,43 @@
-import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from '@common/globals-filter/http-exceptions-filter';
-import { ConfigService } from '@nestjs/config';
+import { NestFactory, Reflector } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-// import { runMigrations } from '@config/database/migration-runner';
-// Import the runMigrations function if you decide to uncomment it
+import { AppModule } from './app.module';
+import { HttpExceptionFilter } from '@common/globals-filter/http-exceptions-filter';
+import { WinstonLoggerService } from '@common/logger/winston.service';
+import { ConfigService } from '@nestjs/config';
 
-/**
- * The entry point of the NestJS application. It sets up and configures the application
- * environment, including global middleware, pipes, and filters.
- */
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  // Retrieve the ConfigService instance to access environment variables and application configuration.
+  const app = await NestFactory.create(AppModule, {
+    logger: new WinstonLoggerService() // Custom Winston logger
+  });
+
   const configService = app.get(ConfigService);
 
-  // Enable CORS for the frontend app to access the API.
   app.enableCors({
-    origin: configService.get('FRONTEND_URL'), // Allow requests from this origin (frontend app) using vite dev server
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
-    allowedHeaders: 'Content-Type, Accept' // Allow these headers
+    origin: configService.get('FRONTEND_URL'),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept'
   });
-  // Use helmet middleware for setting various HTTP headers to secure the app.
+
+  // Middleware for parsing cookies and setting security headers
+  app.use(cookieParser());
   app.use(helmet());
-  // Use a global validation pipe for automatically validating DTOs (Data Transfer Objects).
-  app.useGlobalPipes(new ValidationPipe());
-  // Use a global exception filter for handling HTTP exceptions in a standardized way.
+
+  // Globally applied pipes, filters, and interceptors
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // Automatically transform payloads to DTO instances
+      whitelist: true // Strip non-whitelisted properties
+    })
+  );
+
+  // Globally applied filter and interceptor
   app.useGlobalFilters(new HttpExceptionFilter(configService));
-  // Use a global class serializer interceptor for automatically serializing responses.
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  // Optionally, run database migrations automatically on application startup.
-  // This line is commented out by default. Uncomment it to enable automatic migration on startup.
-  // await runMigrations();
-  await app.listen(configService.get('PORT') || 3000);
+  // Listening on a port defined in the environment or a default
+  await app.listen(configService.get('PORT', 3000));
 }
+
 bootstrap();
