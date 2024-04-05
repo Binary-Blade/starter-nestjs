@@ -1,42 +1,51 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# NestJS Advanced Starter Kit
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-# NestJS Starter Kit
-
-This NestJS Starter Kit serves as a robust foundation for building scalable and maintainable backend applications with the NestJS framework. 
-It comes equipped with pre-configured modules for authentication, authorization, and various core functionalities, ensuring a solid starting point for any project.
+This advanced NestJS Starter Kit is an extension of the robust foundation provided by NestJS for building scalable and maintainable backend applications. It enhances the base setup with pre-configured modules for authentication, authorization, Redis integration for token management, Nginx as a reverse proxy, and more, ensuring a comprehensive starting point for any project aiming at high scalability and security.
 
 ## Features
 
-- **TypeORM Integration**: Pre-configured TypeORM for efficient database interaction with support for automatic migrations.
-- **Authentication System**: Robust JWT-based authentication with access and refresh token support.
-- **User Management**: Comprehensive user module for registration, profile management, and more, including custom user roles.
-- **Security Practices**: Enhanced security with password hashing and token management.
-- **Custom Decorators**: Utilizes custom decorators for roles and authorization to protect routes based on user roles.
-- **Configuration Management**: Environment-specific configuration setup leveraging `.env` files for seamless application settings management.
-- **Health Check**: Built-in health check endpoint for monitoring application health and status.
+- **Redis Integration**: Utilizes Redis for efficient JWT token management, supporting token invalidation and scalable session management.
+- **Nginx as Reverse Proxy**: Pre-configured Nginx setup for load balancing and to serve as a reverse proxy, enhancing security and performance.
+- **Enhanced Authentication System**: Builds upon JWT-based authentication with access and refresh token support, leveraging Redis for stateless session management.
+- **Advanced User Management**: Extends the comprehensive user module with advanced features such as role-based access control (RBAC) and more.
+- **Security Best Practices**: Includes configurations for security headers, rate limiting, and CORS through Nginx, along with password hashing and secure token handling in NestJS.
+- **Custom Decorators and Guards**: For refined role and authorization management to protect routes based on user roles and permissions.
+- **Configuration Management and Secrets**: Secure handling of application secrets and configurations using `.env` files and Docker secrets for production environments.
+- **Health Check and Monitoring**: Extended health check endpoints for application and Redis health status, facilitating monitoring and alerting.
 
 ## Project Structure
 
+Enhanced project structure with Redis and Nginx configurations:
+
 ```plaintext
-src/
-├── common/                 # Common module with guards, decorators, and exceptions
-├── config/                 # Configuration management and securities
-│   ├──── database/         # Database configuration and entities
-│   ├──── migrations/       # TypeORM migrations
-│   └──── securities/       # Security modules for hashing and token management
-├── modules/
-│   ├──── auth/             # Authentication module with login, signup, and guards
-│   └──── users/            # User module with user entity and service
-├── app.module.ts           # Main application module
-└── main.ts                 # Application entry file
-test/
-├── auth.e2e-spec.ts        # End-to-end tests for authentication
-└── users.e2e-spec.ts       # End-to-end tests for user management
+/
+├── nginx/                     # Nginx configuration files for reverse proxy setup
+├── src/                       # Source files of the NestJS application
+│   ├── common/                # Common module with decorators, exceptions, and utilities
+│   │   ├── decorators/        # Custom decorators, e.g., roles or current user
+│   │   ├── exceptions/        # Custom exception filters
+│   │   ├── globals-filter/    # Global filters, e.g., for catching exceptions
+│   │   ├── interfaces/        # TypeScript interfaces used across the app
+│   │   └── logger/            # Application-wide logger service
+│   ├── database/              # Database configuration and migration management
+│   │   ├── migrations/        # TypeORM migrations directory
+│   │   └── redis/             # Redis configuration and service
+│   ├── modules/               # Application feature modules
+│   │   └── users/             # User module including DTOs, entity, and service
+│   ├── security/              # Security related features like auth, encryption, guards
+│   │   ├── auth/              # Authentication module including JWT strategy and service
+│   │   ├── token/             # Token management services
+│   │   ├── encryption/        # Encryption service for password hashing
+│   │   └── throttler/         # Rate limiting configuration
+│   ├── app.module.ts          # Root application module
+│   └── main.ts                # Application bootstrap file
+├── test/                      # Test setup and test cases
+├── .env.example               # Example of environment configuration for reference
+└── Dockerfile                 # Dockerfile for building the NestJS application
+└── docker-compose.yml         # Docker Compose configuration for running the application
+└── Makefile                   # Makefile for running common tasks
+└── tsconfig.json              # TypeScript configuration file
+
 ```
 
 ## Getting Started
@@ -46,7 +55,8 @@ This project is designed to get you up and running with a fully configured NestJ
 ### Prerequisites
 
 - Node.js (v14 or later)
-- A package manager like npm or yarn
+- A package manager pnpm 
+- An understanding of Docker, Redis, and Nginx basics
 - Docker and Docker Compose 
 
 ### Installation
@@ -78,16 +88,23 @@ DB_NAME=dev                       # The name of the database to connect to.
 DB_USERNAME=admin-db              # The username used for the database connection.
 DB_PASSWORD=password              # The password used for the database connection.
 
+# Redis configuration
+REDIS_HOST=redis
+REDIS_PORT=6379
+
 # JWT Configuration
 JWT_ACCESS_TOKEN_SECRET=secret-key       # The secret key for signing JWT access tokens.
-JWT_ACCESS_TOKEN_EXPIRATION=10d          # The expiration time for JWT access tokens.
+JWT_ACCESS_TOKEN_EXPIRATION=15m             # The expiration time for JWT access tokens.
 JWT_REFRESH_TOKEN_SECRET=secret-key      # The secret key for signing JWT refresh tokens.
 JWT_REFRESH_TOKEN_EXPIRATION=30d         # The expiration time for JWT refresh tokens.
 
 # Server Configuration
 PORT=3000                         # The port number on which the NestJS server will listen.
-# Environment
 NODE_ENV=development              # The environment in which the application is running. Use 'production' for production environments.
+
+# Frontend connexion
+FRONTEND_URL=http://localhost:5173 # The URL of the frontend application. Used for CORS.
+
 ```
 
 Make sure to review and modify the .env file according to your development and production needs.
@@ -104,6 +121,13 @@ This command will spin up the PostgreSQL database service and the NestJS applica
 
 Feel free to dive into the Dockerfile and docker-compose.yml files to understand the container setup or to make any necessary customizations to fit your project's requirements.
 
+
+## Running redis
+- To run redis, use the following command:
+```bash
+make redis
+```
+
 ## Running Migrations
 Migrations manage your database schema evolution. Create and run migrations using the provided Make commands:
 
@@ -115,7 +139,6 @@ This command will ask for the migration name interactively.
 
 ```bash
 Enter migration name: <migration-name>
-
 ```
 
 - Run pending migrations:
