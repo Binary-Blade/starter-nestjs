@@ -13,7 +13,14 @@ migrate-revert:
 	docker-compose exec dev pnpm run migration:revert
 
 # === TESTING ====
+# Run tests
 test:
 	docker-compose exec dev pnpm run test
 
-.PHONY: migrate-create migrate-run migrate-revert test
+# === REDIS ====
+
+# Connect to the redis cli
+redis:
+	docker-compose exec redis redis-cli
+
+.PHONY: migrate-create migrate-run migrate-revert test redis

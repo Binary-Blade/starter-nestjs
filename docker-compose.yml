@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  # DATABASE - POSTGRESQL
-  # Setup for the PostgreSQL database service
+# DATABASE - POSTGRESQL
+# Setup the PostgreSQL database service
   postgres:
     container_name: db-postgres
     image: postgres:16-alpine
@@ -18,10 +18,23 @@ services:
     networks:
       - app
 
- # API GATEWAY - NGINX
- # Configuration for the Nginx service.
+# REDIS - CACHE
+# Setup the Redis cache service.
+  redis:
+    container_name: redis-cache
+    image: redis:alpine
+    ports:
+      - "6379:6379" 
+    networks:
+      - app
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+# API GATEWAY - NGINX
+# Setup the Nginx service.
   nginx:
-    container_name: nginx-api-gateway
+    container_name: nginx-gateway
     image: nginx:alpine
     ports:
       - "80:80" 
@@ -32,8 +45,8 @@ services:
     networks:
       - app
 
-  # SERVER - NESTJS
-  # Configuration for the NestJS server service.
+# SERVER - NESTJS
+# Setup the NestJS server service.
   dev:
     container_name: nestjs-server
     build:
@@ -55,4 +68,5 @@ networks:
   app:
 
 volumes:
-  pg-data:  # PERSISTENT VOLUME POSTGRESQL - DB
+  pg-data:  # PERSISTENT VOLUME : db-postgres 
+  redis-data: # PERSISTENT VOLUME : redis-cache 
