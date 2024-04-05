@@ -51,8 +51,6 @@ pids
 *.pid
 *.seed
 *.pid.lock
-*pnpm-lock.yaml
-.pnpm-lock.yaml
 pnpm-lock.yaml
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
