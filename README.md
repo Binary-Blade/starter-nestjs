@@ -1,6 +1,7 @@
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
+
 # NestJS Advanced Starter Kit
 
 This advanced NestJS Starter Kit is an extension of the robust foundation provided by NestJS for building scalable and maintainable backend applications. It enhances the base setup with pre-configured modules for authentication, authorization, Redis integration for token management, Nginx as a reverse proxy, and more, ensuring a comprehensive starting point for any project aiming at high scalability and security.
