@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { UserId } from '@common/decorators/user-id.decorator';
@@ -67,7 +67,8 @@ export class AuthController {
    * @returns A promise resolved to a new set of access and refresh tokens.
    */
   @UseGuards(AccessTokenGuard)
-  @Post('/refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @Post('/refresh')
   async refreshToken(@Body() { refreshToken }: RefreshTokenDto) {
     return await this.tokenService.refreshToken(refreshToken);
   }
