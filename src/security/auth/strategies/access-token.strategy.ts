@@ -27,7 +27,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Extract JWT from the Auth Header
       secretOrKey: configService.get<string>('JWT_ACCESS_TOKEN_SECRET') ?? '', // Get the secret key for verifying the token
-      ignoreExpiration: false, // Ensure the expiration is not ignored
+      ignoreExpiration: false // Ensure the expiration is not ignored
     });
   }
 
@@ -38,14 +38,12 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
    * @throws UnauthorizedException if the user cannot be found or the token is invalid.
    */
   async validate(payload: JwtPayload): Promise<User> {
-    // Look for the user associated with the user ID from the payload
     const user = await this.usersRepository.findOne({ where: { userId: payload.sub } });
-    // If no user is found, throw an UnauthorizedException
     if (!user || user.tokenVersion !== payload.version) {
       throw new UnauthorizedException('Token has been invalidated');
     }
+
     // Return the user object for request property attachment if validation passes
     return user;
   }
 }
-
