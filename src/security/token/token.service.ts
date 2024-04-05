@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
 import { User } from '@modules/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { RedisService } from '@database/redis/redis.service';
+import { Payload } from '@security/interfaces/payload.interface';
 
 /**
  * Service responsible for managing JWT tokens, including their creation and validation.
@@ -12,12 +14,22 @@ import { Repository } from 'typeorm';
  */
 @Injectable()
 export class TokenService {
+  private readonly accessTokenSecret: string;
+  private readonly accessTokenExpiration: string;
+  private readonly refreshTokenSecret: string;
+  private readonly refreshTokenExpiration: string;
+
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>, // Injects the User repository for database interactions.
-    private jwtService: JwtService, // Injects Nest's JwtService for token operations.
-    private configService: ConfigService // Injects ConfigService for accessing environment variables.
-  ) {}
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private redisService: RedisService
+  ) {
+    this.accessTokenSecret = this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET');
+    this.accessTokenExpiration = this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRATION');
+    this.refreshTokenSecret = this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET');
+    this.refreshTokenExpiration = this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION');
+  }
 
   /**
    * Generates JWT access and refresh tokens for a user.
@@ -26,48 +38,81 @@ export class TokenService {
    * @returns A promise that resolves to an object containing the generated tokens.
    */
   async getTokens(user: User): Promise<JWTTokens> {
-    const payload = {
+    const payload: Payload = {
       sub: user.userId, // Subject field typically contains the user identifier.
       role: user.role, // Custom claim to include the user's role in the token.
       version: user.tokenVersion // Includes tokenVersion to support token invalidation.
     };
 
-    // Generates the access token with a specific secret and expiration time.
-    const token = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRATION')
-    });
+    const token = this.generateAccessToken(payload);
+    const refreshToken = this.generateRefreshToken(payload);
 
-    // Generates the refresh token with a different secret and longer expiration time.
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION')
-    });
-
+    const refreshTokenTTL = this.convertDaysToSeconds(this.refreshTokenExpiration);
+    await this.redisService.set(`refresh_token_${user.userId}`, refreshToken, refreshTokenTTL);
     return { token, refreshToken };
   }
 
-  /**
-   * Validates a refresh token and generates new JWT tokens if the refresh token is valid.
-   *
-   * @param token The refresh token to be validated.
-   * @returns A promise that resolves to new JWT access and refresh tokens.
-   * @throws UnauthorizedException If the refresh token is invalid or the user does not exist.
-   */
   async refreshToken(token: string): Promise<JWTTokens> {
+    const userId = await this.verifyRefreshToken(token);
+
+    await this.removeRefreshToken(userId);
+    const user = await this.usersRepository.findOneOrFail({ where: { userId } });
+
+    const tokens = await this.getTokens(user);
+
+    const refreshTokenTTL = this.convertDaysToSeconds(this.refreshTokenExpiration);
+    await this.storeRefreshToken(user.userId, tokens.refreshToken, refreshTokenTTL);
+
+    return tokens;
+  }
+
+  private async verifyRefreshToken(token: string): Promise<number> {
     try {
-      // Verifies the refresh token using its secret.
-      const { sub: userId } = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET')
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.refreshTokenSecret
       });
 
-      // Retrieves the user based on the userId from the token's payload.
-      const user = await this.usersRepository.findOneOrFail({ where: { userId } });
+      const userId = payload.sub;
+      const tokenExists = await this.refreshTokenExists(userId, token);
+      if (!tokenExists) {
+        throw new UnauthorizedException('Refresh token does not exist.');
+      }
 
-      // Generates new tokens for the user.
-      return this.getTokens(user);
-    } catch (err) {
-      throw new UnauthorizedException();
+      return userId;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired refresh token.');
     }
+  }
+
+  private generateAccessToken(payload: Payload): string {
+    return this.jwtService.sign(payload, {
+      secret: this.accessTokenSecret,
+      expiresIn: this.accessTokenExpiration
+    });
+  }
+
+  private generateRefreshToken(payload: Payload): string {
+    return this.jwtService.sign(payload, {
+      secret: this.refreshTokenSecret,
+      expiresIn: this.refreshTokenExpiration
+    });
+  }
+
+  private convertDaysToSeconds(duration: string): number {
+    const days = parseInt(duration.replace('d', ''), 10); // Assure la suppression du 'd' pour la conversion
+    return days * 86400;
+  }
+
+  async storeRefreshToken(userId: number, refreshToken: string, ttl: number) {
+    await this.redisService.set(`refresh_token_${userId}`, refreshToken, ttl);
+  }
+
+  async removeRefreshToken(userId: number) {
+    await this.redisService.del(`refresh_token_${userId}`);
+  }
+
+  async refreshTokenExists(userId: number, refreshToken: string): Promise<boolean> {
+    const storedToken = await this.redisService.get(`refresh_token_${userId}`);
+    return storedToken === refreshToken;
   }
 }
