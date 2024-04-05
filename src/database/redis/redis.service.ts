@@ -5,12 +5,12 @@ import Redis from 'ioredis';
 export class RedisService {
   constructor(@Inject('REDIS_CLIENT') private readonly redisClient: Redis) {}
 
-  async setData(key: string, value: string): Promise<string> {
-    await this.redisClient.set(key, value, 'EX', 60); // Set key to expire in 60 seconds
+  async set(key: string, value: string, ttl: number): Promise<string> {
+    await this.redisClient.set(key, value, 'EX', ttl);
     return `Data set for key: ${key}`;
   }
 
-  async getData(key: string): Promise<string | null> {
+  async get(key: string): Promise<string | null> {
     const value = await this.redisClient.get(key);
     if (value) {
       console.log(`Retrieved value from cache: ${value}`);
@@ -20,7 +20,7 @@ export class RedisService {
     return value;
   }
 
-  async deleteData(key: string): Promise<number> {
+  async del(key: string): Promise<number> {
     const result = await this.redisClient.del(key);
     console.log(`Deleted key from cache: ${key}, result: ${result}`);
     return result; // Returns the number of keys that were removed.

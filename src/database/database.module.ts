@@ -8,14 +8,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres', // The database type.
-        host: config.get<string>('DB_HOST'), // Database host.
-        port: config.get<number>('DB_PORT'), // Database port.
-        username: config.get<string>('DB_USERNAME'), // Database username.
-        password: config.get<string>('DB_PASSWORD'), // Database password.
-        database: config.get<string>('DB_NAME'), // Database name.
-        synchronize: false, // Auto-sync database schema if set to true. NOTE: Switch to true in production mode
-        entities: [__dirname + '/**/*.entity{.ts,.js}'] // Entities path.
+        type: 'postgres',
+        host: config.get<string>('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get<string>('DB_USERNAME'),
+        password: config.get<string>('DB_PASSWORD'),
+        database: config.get<string>('DB_NAME'),
+        synchronize: false, // Disable auto schema synchronization to prevent data loss in production
+        entities: [__dirname + '/../**/*.entity{.ts,.js}'] // Adjust the path as necessary
       })
     })
   ]
