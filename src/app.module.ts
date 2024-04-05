@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '@modules/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '@modules/users/users.module';
-
+import { RedisModule } from '@database/redis-cache/redis.module';
+import { DatabaseModule } from '@database/database.module';
+import { AuthModule } from '@security/auth/auth.module';
 /**
  * The root module of the application. It bundles all feature modules and
  * global configurations like environment variables and database setup.
@@ -15,24 +15,22 @@ import { UsersModule } from '@modules/users/users.module';
       envFilePath: './.env',
       isGlobal: true
     }),
-    // Asynchronous database module initialization with configurations from the ConfigModule.
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres', // The database type.
-        host: config.get<string>('DB_HOST'), // Database host.
-        port: config.get<number>('DB_PORT'), // Database port.
-        username: config.get<string>('DB_USERNAME'), // Database username.
-        password: config.get<string>('DB_PASSWORD'), // Database password.
-        database: config.get<string>('DB_NAME'), // Database name.
-        synchronize: false, // Auto-sync database schema if set to true. NOTE: Switch to true in production mode
-        entities: [__dirname + '/**/*.entity{.ts,.js}'] // Entities path.
-      })
-    }),
-    // Feature modules.
+    DatabaseModule,
+    RedisModule,
     AuthModule,
     UsersModule
+
+    /**
+      NOTE: Configure it instead of using nginx if you want more flexibility or other solutions.
+      Rate limiting module to prevent abuse of the API.
+      
+      ThrottlerModule.forRoot([
+      {
+         ttl: 60000,
+         limit: 10
+       }
+     ]),
+    */
   ]
 })
 export class AppModule {}
