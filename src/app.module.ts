@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '@modules/users/users.module';
-import { RedisModule } from '@database/redis-cache/redis.module';
+import { RedisModule } from '@database/redis/redis.module';
 import { DatabaseModule } from '@database/database.module';
 import { AuthModule } from '@security/auth/auth.module';
 /**
@@ -20,17 +20,8 @@ import { AuthModule } from '@security/auth/auth.module';
     AuthModule,
     UsersModule
 
-    /**
-      NOTE: Configure it instead of using nginx if you want more flexibility or other solutions.
-      Rate limiting module to prevent abuse of the API.
-      
-      ThrottlerModule.forRoot([
-      {
-         ttl: 60000,
-         limit: 10
-       }
-     ]),
-    */
+    // NOTE: Configure it to prevent abuse of the API instead of nginx if necessary.
+    // ThrollerModule
   ]
 })
 export class AppModule {}
