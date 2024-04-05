@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
-import { EncryptionService, TokenService } from '@config/security';
 import { CreateUserDto } from '@modules/users/dto';
+import { EncryptionService } from '@security/encryption/encryption.service';
+import { TokenService } from '@security/token/token.service';
+import { User } from '@modules/users/entities/user.entity';
 
 describe('AuthService', () => {
   let authService: AuthService;

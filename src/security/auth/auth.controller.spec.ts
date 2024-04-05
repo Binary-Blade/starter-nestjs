@@ -4,8 +4,8 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { LoginDTO } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { AccessTokenGuard } from '@common/guards/access-token.guard';
-import { TokenService } from '@config/security';
+import { TokenService } from '@security/token/token.service';
+import { AccessTokenGuard } from '@security/guards';
 
 describe('AuthController', () => {
   let controller: AuthController;

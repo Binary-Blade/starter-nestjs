@@ -13,8 +13,8 @@
     "paths": {
       "@common/*": ["src/common/*"],
       "@modules/*": ["src/modules/*"],
-      "@libs/*": ["src/libs/*"],
-      "@config/*": ["src/config/*"],
+      "@security/*": ["src/security/*"],
+      "@database/*": ["src/database/*"],
       },
     "incremental": true,
     "skipLibCheck": true,

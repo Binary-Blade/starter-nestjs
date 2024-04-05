@@ -22,5 +22,5 @@ export default new DataSource({
   username: configService.get<string>('DB_USERNAME'), // Database username
   password: configService.get<string>('DB_PASSWORD'), // Database password
   entities: [__dirname + '/../../modules/**/*.entity{.ts,.js}'], // Entities path
-  migrations: [__dirname + '/../../config/migrations/*{.ts,.js}'] // Migrations path
+  migrations: [__dirname + '/../database/migrations/*{.ts,.js}'] // Migrations path
 });

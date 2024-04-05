@@ -1,10 +1,11 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
-import { AccessTokenGuard } from '@common/guards/access-token.guard';
-import { LoginDTO, RefreshTokenDto } from './dto';
-import { TokenService } from '@config/security';
 import { UserId } from '@common/decorators/user-id.decorator';
+import { TokenService } from '@security/token/token.service';
+import { AccessTokenGuard } from '@security/guards';
+import { LoginDTO } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 /**
  * Controller that handles authentication-related requests.

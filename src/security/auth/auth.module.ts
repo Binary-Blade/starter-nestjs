@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { EncryptionService, TokenService } from '@config/security';
+import { UsersService } from '@modules/users/users.service';
+import { TokenService } from '@security/token/token.service';
+import { EncryptionService } from '@security/encryption/encryption.service';
+import { User } from '@modules/users/entities/user.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])], // Registers the User entity for TypeORM

@@ -6,7 +6,8 @@ import { JWTTokens } from '@common/interfaces/jwt.interface';
 import { InvalidCredentialsException } from '@common/exceptions/invalid-credentials.exception';
 import { CreateUserDto } from '@modules/users/dto';
 import { UserRole } from '@modules/users/enums/user-role.enum';
-import { EncryptionService, TokenService } from '@config/security';
+import { TokenService } from '@security/token/token.service';
+import { EncryptionService } from '@security/encryption/encryption.service';
 
 /**
  * Service providing authentication functionality.
