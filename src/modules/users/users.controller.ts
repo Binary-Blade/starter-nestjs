@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { Role } from '@common/decorators/role.decorator';
 import { UserRole } from './enums/user-role.enum';
 import { UpdateUserDto } from './dto';
-import { AccessTokenGuard, IsCreatorGuard, RoleGuard } from '@common/guards';
+import { AccessTokenGuard, IsCreatorGuard, RoleGuard } from '@security/guards';
 
 /**
  * Controller that manages user operations. It includes endpoints for fetching,

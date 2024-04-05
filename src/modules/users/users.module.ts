@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { AccessTokenStrategy } from '../auth/strategies/access-token.strategy';
+import { AccessTokenStrategy } from '@security/auth/strategies/access-token.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])], // Registers the User entity for TypeORM

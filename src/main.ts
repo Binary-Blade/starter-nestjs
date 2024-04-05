@@ -1,7 +1,7 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from '@common/globals-filter/http-exceptions-filter';
 import { WinstonLoggerService } from '@common/logger/winston.service';
@@ -27,7 +27,7 @@ async function bootstrap() {
   // Globally applied pipes, filters, and interceptors
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // Automatically transform payloads to DTO instances
+      //transform: true, // Automatically transform payloads to DTO instances
       whitelist: true // Strip non-whitelisted properties
     })
   );

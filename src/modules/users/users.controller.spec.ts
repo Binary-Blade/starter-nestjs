@@ -3,9 +3,7 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessTokenGuard } from '@common/guards/access-token.guard';
-import { RoleGuard } from '@common/guards/role.guard';
-import { IsCreatorGuard } from '@common/guards/is-creator.guard';
+import { AccessTokenGuard, IsCreatorGuard, RoleGuard } from '@security/guards';
 
 describe('UsersController', () => {
   let controller: UsersController;
