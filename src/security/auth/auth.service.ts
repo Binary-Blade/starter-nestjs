@@ -62,7 +62,7 @@ export class AuthService {
    * @returns A promise that resolves to an object containing JWT tokens.
    * @throws InvalidCredentialsException if the login credentials are invalid.
    */
-  async login(email: string, password: string): Promise<JWTTokens> {
+  async login(email: string, password: string) {
     // Find the user by email
     const user = await this.usersRepository.findOneBy({ email });
     if (!user) {
@@ -76,8 +76,9 @@ export class AuthService {
     // Save the user's last login date
     user.lastLogin = new Date();
     await this.usersRepository.save(user);
-    // Return the JWT tokens for the user
-    return this.tokenService.getTokens(user);
+    // Generate JWT tokens for the user
+    const tokens = await this.tokenService.getTokens(user);
+    return tokens;
   }
 
   /**
@@ -88,8 +89,9 @@ export class AuthService {
   async logout(userId: number): Promise<void> {
     const user = await this.usersRepository.findOneBy({ userId });
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException('User not connected');
     }
+    await this.tokenService.removeRefreshToken(userId);
     user.tokenVersion += 1; // Incrementing the tokenVersion invalidates previous tokens.
     await this.usersRepository.save(user);
   }
