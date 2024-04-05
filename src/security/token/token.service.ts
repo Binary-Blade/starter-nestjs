@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,6 +18,7 @@ export class TokenService {
   private readonly accessTokenExpiration: string;
   private readonly refreshTokenSecret: string;
   private readonly refreshTokenExpiration: string;
+  private readonly logger = new Logger(TokenService.name);
 
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
@@ -53,17 +54,22 @@ export class TokenService {
   }
 
   async refreshToken(token: string): Promise<JWTTokens> {
-    const userId = await this.verifyRefreshToken(token);
+    this.logger.debug(`Refreshing token for token: ${token}`);
+    try {
+      const userId = await this.verifyRefreshToken(token);
+      await this.removeRefreshToken(userId);
 
-    await this.removeRefreshToken(userId);
-    const user = await this.usersRepository.findOneOrFail({ where: { userId } });
+      const user = await this.usersRepository.findOneOrFail({ where: { userId } });
+      const tokens = await this.getTokens(user);
 
-    const tokens = await this.getTokens(user);
+      const refreshTokenTTL = this.convertDaysToSeconds(this.refreshTokenExpiration);
+      await this.redisService.set(`refresh_token_${userId}`, tokens.refreshToken, refreshTokenTTL);
 
-    const refreshTokenTTL = this.convertDaysToSeconds(this.refreshTokenExpiration);
-    await this.storeRefreshToken(user.userId, tokens.refreshToken, refreshTokenTTL);
-
-    return tokens;
+      return tokens;
+    } catch (error) {
+      this.logger.error('Token refresh error', { error: error.message, stack: error.stack });
+      throw new UnauthorizedException('Could not refresh the token. Please try again or log in.');
+    }
   }
 
   private async verifyRefreshToken(token: string): Promise<number> {
@@ -71,16 +77,22 @@ export class TokenService {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.refreshTokenSecret
       });
-
       const userId = payload.sub;
       const tokenExists = await this.refreshTokenExists(userId, token);
-      if (!tokenExists) {
-        throw new UnauthorizedException('Refresh token does not exist.');
-      }
 
+      if (!tokenExists) {
+        this.logger.warn(`Token does not exist for user: ${userId}`);
+        throw new UnauthorizedException('Refresh token does not exist or is no longer valid.');
+      }
       return userId;
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired refresh token.');
+      if (error.name === 'TokenExpiredError') {
+        this.logger.warn(`Expired token: ${error.message}`, error.stack);
+        throw new UnauthorizedException('Refresh token expired.');
+      } else {
+        this.logger.error(`Token verification error: ${error.message}`, error.stack);
+        throw new UnauthorizedException('Invalid refresh token.');
+      }
     }
   }
 
@@ -98,15 +110,6 @@ export class TokenService {
     });
   }
 
-  private convertDaysToSeconds(duration: string): number {
-    const days = parseInt(duration.replace('d', ''), 10); // Assure la suppression du 'd' pour la conversion
-    return days * 86400;
-  }
-
-  async storeRefreshToken(userId: number, refreshToken: string, ttl: number) {
-    await this.redisService.set(`refresh_token_${userId}`, refreshToken, ttl);
-  }
-
   async removeRefreshToken(userId: number) {
     await this.redisService.del(`refresh_token_${userId}`);
   }
@@ -114,5 +117,10 @@ export class TokenService {
   async refreshTokenExists(userId: number, refreshToken: string): Promise<boolean> {
     const storedToken = await this.redisService.get(`refresh_token_${userId}`);
     return storedToken === refreshToken;
+  }
+
+  private convertDaysToSeconds(duration: string): number {
+    const days = parseInt(duration.replace('d', ''), 10); // Assure la suppression du 'd' pour la conversion
+    return isNaN(days) ? 0 : days * 86400;
   }
 }
