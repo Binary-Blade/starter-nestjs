@@ -38,7 +38,8 @@ describe('AuthService', () => {
           provide: TokenService,
           useValue: {
             getTokens: jest.fn(),
-            refreshToken: jest.fn() // Assuming there's a method to refresh tokens
+            refreshToken: jest.fn(),
+            removeRefreshToken: jest.fn()
           }
         }
       ]
@@ -98,17 +99,21 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('should increment tokenVersion for the user', async () => {
       const userId = 1;
+      const initialTokenVersion = 1;
       const user = new User();
       user.userId = userId;
-      user.tokenVersion = 0;
+      user.tokenVersion = initialTokenVersion;
 
       jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(user);
-      jest.spyOn(usersRepository, 'save').mockImplementation(async (user: User) => {
-        return { ...user, tokenVersion: user.tokenVersion + 1 };
-      });
+
+      jest.spyOn(tokenService, 'removeRefreshToken').mockImplementation(async () => undefined);
+      jest.spyOn(usersRepository, 'save').mockImplementation(async (user: User) => user);
 
       await authService.logout(userId);
-      expect(usersRepository.save).toHaveBeenCalledWith({ ...user, tokenVersion: 1 });
+
+      expect(usersRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ tokenVersion: initialTokenVersion + 1 })
+      );
     });
 
     it('should throw a NotFoundException if user does not exist', async () => {
