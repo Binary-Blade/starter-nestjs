@@ -1,3 +1,4 @@
+import { NODE_ENV, PROD_ENV } from '@common/constants';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
@@ -31,7 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     };
 
     // Include additional debugging information in non-production environments.
-    if (this.configService.get<string>('NODE_ENV') !== 'production') {
+    if (this.configService.get<string>(NODE_ENV) !== PROD_ENV) {
       errorResponse['path'] = request.url;
       errorResponse['method'] = request.method;
       errorResponse['stack'] = exception.stack;

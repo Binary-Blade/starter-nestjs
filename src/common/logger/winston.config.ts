@@ -1,3 +1,4 @@
+import { DEV_ENV, PROD_ENV } from '@common/constants';
 import * as winston from 'winston';
 
 // Define custom levels if needed
@@ -11,8 +12,8 @@ const levels = {
 
 // Define which level to use based on the environment
 const level = () => {
-  const env = process.env.NODE_ENV || 'development';
-  const isDevelopment = env === 'development';
+  const env = process.env.NODE_ENV || DEV_ENV;
+  const isDevelopment = env === DEV_ENV;
   return isDevelopment ? 'debug' : 'warn';
 };
 
@@ -51,7 +52,7 @@ export const logger = winston.createLogger({
 });
 
 // If not in production, also log to the console with a simpler format
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== PROD_ENV) {
   logger.add(
     new winston.transports.Console({
       format: consoleFormat
