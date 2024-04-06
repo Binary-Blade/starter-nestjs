@@ -29,8 +29,9 @@ export class AuthService {
    */
   async signup(createUserDto: CreateUserDto, role: UserRole = UserRole.USER): Promise<User> {
     // Check for existing user with the same email
-    const existingUser = await this.usersRepository.findOneBy({
-      email: createUserDto.email
+    const existingUser = await this.usersRepository.findOne({
+      select: ['userId'],
+      where: { email: createUserDto.email }
     });
     if (existingUser) {
       throw new UnauthorizedException('Email already exists');
@@ -72,12 +73,40 @@ export class AuthService {
   }
 
   /**
+   * Updates a user's password by verifying their old password and hashing the new password.
+   * @param userId The ID of the user to update.
+   * @param oldPassword The user's current password.
+   * @param newPassword The user's new password.
+   * @returns A promise that resolves when the password is successfully updated.
+   * @throws NotFoundException If the user ID does not exist in the database.
+   * @throws InvalidCredentialsException If the old password does not match the user's current password.
+   */
+  async updatePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
+    const user = await this.usersRepository.findOneBy({ userId });
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
+    const validPassword = await this.encryptionService.verifyPassword(user.password, oldPassword);
+    if (!validPassword) {
+      throw new InvalidCredentialsException();
+    }
+
+    const hashedPassword = await this.encryptionService.hashPassword(newPassword);
+    // Directly assign the new hashed password to the user entity
+    user.password = hashedPassword;
+    await this.usersRepository.save(user);
+  }
+
+  /**
    * Logs out a user by invalidating their current refresh token and incrementing their token version.
    * @param userId The ID of the user to logout.
    * @throws NotFoundException If the user ID does not exist in the database.
    */
   async logout(userId: number): Promise<void> {
-    const user = await this.usersRepository.findOneBy({ userId });
+    const user = await this.usersRepository.findOne({
+      select: ['userId', 'tokenVersion'], // Sélectionne uniquement l'identifiant et tokenVersion
+      where: { userId }
+    });
     if (!user) {
       throw new NotFoundException('User not connected');
     }

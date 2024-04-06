@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { UserId } from '@common/decorators/user-id.decorator';
@@ -6,6 +6,7 @@ import { TokenService } from '@security/token/token.service';
 import { AccessTokenGuard } from '@security/guards';
 import { LoginDTO } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { UpdatePasswordDTO } from './dto/update-password.dto';
 
 /**
  * Controller that handles authentication-related requests.
@@ -57,6 +58,16 @@ export class AuthController {
   async logout(@UserId() userId: number) {
     await this.authService.logout(userId);
     return { message: 'Logged out successfully' };
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('change-password')
+  async updatePassword(@UserId() userId: number, @Body() updatePasswordDto: UpdatePasswordDTO) {
+    return await this.authService.updatePassword(
+      userId,
+      updatePasswordDto.oldPassword,
+      updatePasswordDto.newPassword
+    );
   }
 
   /**
