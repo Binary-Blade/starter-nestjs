@@ -4,17 +4,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Module({
-  imports: [ConfigModule], // Make sure to import the ConfigModule if using ConfigService
+  imports: [ConfigModule],
   providers: [
     {
       provide: 'REDIS_CLIENT',
       useFactory: async (configService: ConfigService) =>
         new Redis({
-          host: configService.get('REDIS_HOST'), // Default to 'localhost' if not defined
-          port: configService.get('REDIS_PORT') // Default to 6379 if not defined
-          // Include additional Redis options here if necessary
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+          password: configService.get('REDIS_PASSWORD')
         }),
-      inject: [ConfigService] // Ensure ConfigService is injected
+      inject: [ConfigService]
     },
     RedisService
   ],
