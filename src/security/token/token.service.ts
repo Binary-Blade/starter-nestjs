@@ -32,12 +32,12 @@ export class TokenService {
   private readonly logger = new Logger(TokenService.name);
 
   /**
-   * Initializes the TokenService with the required dependencies.
-   *
+   * Constructs the TokenService with the required dependencies.
    * @param usersRepository The repository for user entities.
-   * @param jwtService The service for signing and verifying JWT tokens.
+   * @param jwtService The service for creating and verifying JWT tokens.
    * @param configService The service for accessing environment variables.
    * @param redisService The service for interacting with the Redis store.
+   * @returns An instance of the TokenService.
    */
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
