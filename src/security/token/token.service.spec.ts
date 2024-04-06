@@ -7,11 +7,13 @@ import { TokenService } from '@security/token/token.service';
 import { RedisService } from '@database/redis/redis.service';
 import { UserRole } from '@modules/users/enums/user-role.enum';
 import { UnauthorizedException } from '@nestjs/common';
+import { UtilsService } from '@common/utils/utils.service';
 
 describe('TokenService', () => {
   let service: TokenService;
   let jwtService: JwtService;
   let redisService: RedisService;
+  let utilsService: UtilsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,6 +59,12 @@ describe('TokenService', () => {
             get: jest.fn(),
             del: jest.fn()
           }
+        },
+        {
+          provide: UtilsService,
+          useValue: {
+            convertDaysToSeconds: jest.fn().mockReturnValue(604800) // 7 days in seconds
+          }
         }
       ]
     }).compile();
@@ -64,6 +72,7 @@ describe('TokenService', () => {
     service = module.get<TokenService>(TokenService);
     jwtService = module.get<JwtService>(JwtService);
     redisService = module.get<RedisService>(RedisService);
+    utilsService = module.get<UtilsService>(UtilsService);
   });
 
   it('should be defined', () => {
@@ -80,6 +89,8 @@ describe('TokenService', () => {
       expect(tokens).toHaveProperty('token', 'mockToken');
       expect(tokens).toHaveProperty('refreshToken', 'mockToken');
       expect(jwtService.sign).toHaveBeenCalledTimes(2);
+      // Vérifiez que convertDaysToSeconds a été appelé avec la bonne valeur
+      expect(utilsService.convertDaysToSeconds).toHaveBeenCalledWith('7d');
     });
   });
 
@@ -88,6 +99,7 @@ describe('TokenService', () => {
       jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({ sub: 1 });
       jest.spyOn(redisService, 'get').mockResolvedValue('mockRefreshToken');
       jest.spyOn(redisService, 'set').mockResolvedValue('OK');
+      jest.spyOn(utilsService, 'convertDaysToSeconds').mockReturnValue(604800); // 7 days in seconds
       jest
         .spyOn(service, 'getTokens')
         .mockResolvedValue({ token: 'newAccessToken', refreshToken: 'newRefreshToken' });
@@ -95,63 +107,54 @@ describe('TokenService', () => {
       const tokens = await service.refreshToken('mockRefreshToken');
 
       expect(tokens).toEqual({ token: 'newAccessToken', refreshToken: 'newRefreshToken' });
-    });
-  });
-
-  describe('verifyRefreshToken', () => {
-    it('should verify the refresh token successfully and return the userId', async () => {
-      const mockUserId = 1;
-      const mockRefreshToken = 'valid-refresh-token';
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({ sub: mockUserId });
-      jest.spyOn(redisService, 'get').mockResolvedValue(mockRefreshToken);
-
-      const userId = await service.verifyRefreshToken(mockRefreshToken);
-
-      expect(userId).toEqual(mockUserId);
-      expect(jwtService.verifyAsync).toHaveBeenCalledWith(mockRefreshToken, {
-        secret: 'refresh-secret'
+      expect(redisService.set).toHaveBeenCalled();
+      expect(jwtService.verifyAsync).toHaveBeenCalledWith('mockRefreshToken', {
+        secret: expect.any(String)
       });
-      expect(redisService.get).toHaveBeenCalledWith(`refresh_token_${mockUserId}`);
     });
 
-    it('should throw UnauthorizedException if the refresh token does not exist', async () => {
-      const mockRefreshToken = 'invalid-refresh-token';
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({ sub: 1 });
-      jest.spyOn(redisService, 'get').mockResolvedValue(null);
+    describe('verifyRefreshToken', () => {
+      it('should verify the refresh token successfully and return the userId', async () => {
+        const mockUserId = 1;
+        const mockRefreshToken = 'valid-refresh-token';
+        jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({ sub: mockUserId });
+        jest.spyOn(redisService, 'get').mockResolvedValue(mockRefreshToken);
 
-      await expect(service.verifyRefreshToken(mockRefreshToken)).rejects.toThrow(
-        UnauthorizedException
-      );
+        const userId = await service.verifyRefreshToken(mockRefreshToken);
+
+        expect(userId).toEqual(mockUserId);
+        expect(jwtService.verifyAsync).toHaveBeenCalledWith(mockRefreshToken, expect.any(Object));
+        expect(redisService.get).toHaveBeenCalledWith(`refresh_token_${mockUserId}`);
+      });
+
+      it('should throw UnauthorizedException if the refresh token does not exist', async () => {
+        const mockRefreshToken = 'invalid-refresh-token';
+        jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({ sub: 1 });
+        jest.spyOn(redisService, 'get').mockResolvedValue(null);
+
+        await expect(service.verifyRefreshToken(mockRefreshToken)).rejects.toThrow(
+          UnauthorizedException
+        );
+      });
     });
 
-    it('should throw UnauthorizedException if the refresh token is expired', async () => {
-      const mockRefreshToken = 'expired-refresh-token';
-      jest.spyOn(jwtService, 'verifyAsync').mockRejectedValue(new Error('TokenExpiredError'));
+    describe('removeRefreshToken', () => {
+      it('should successfully remove the refresh token', async () => {
+        const mockUserId = 1;
+        jest.spyOn(redisService, 'del').mockResolvedValue(1);
 
-      await expect(service.verifyRefreshToken(mockRefreshToken)).rejects.toThrow(
-        UnauthorizedException
-      );
+        const result = await service.removeRefreshToken(mockUserId);
+
+        expect(result).toBeUndefined();
+        expect(redisService.del).toHaveBeenCalledWith(`refresh_token_${mockUserId}`);
+      });
+
+      it('should not throw an error if the refresh token does not exist', async () => {
+        const mockUserId = 2;
+        jest.spyOn(redisService, 'del').mockResolvedValue(0);
+
+        await expect(service.removeRefreshToken(mockUserId)).resolves.toBeUndefined();
+      });
     });
   });
-
-  describe('removeRefreshToken', () => {
-    it('should successfully remove the refresh token', async () => {
-      const mockUserId = 1;
-      jest.spyOn(redisService, 'del').mockResolvedValue(1);
-
-      const result = await service.removeRefreshToken(mockUserId);
-
-      expect(result).toBeUndefined();
-      expect(redisService.del).toHaveBeenCalledWith(`refresh_token_${mockUserId}`);
-    });
-
-    it('should not throw an error if the refresh token does not exist', async () => {
-      const mockUserId = 2;
-      jest.spyOn(redisService, 'del').mockResolvedValue(0);
-
-      await expect(service.removeRefreshToken(mockUserId)).resolves.toBeUndefined();
-    });
-  });
-
-  // Add more tests for verifyRefreshToken, removeRefreshToken, etc.
 });

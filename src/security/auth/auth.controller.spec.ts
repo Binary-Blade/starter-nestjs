@@ -22,7 +22,8 @@ describe('AuthController', () => {
           useValue: {
             signup: jest.fn(),
             login: jest.fn(),
-            logout: jest.fn()
+            logout: jest.fn(),
+            updatePassword: jest.fn()
           }
         },
         {
@@ -82,20 +83,14 @@ describe('AuthController', () => {
 
   describe('updatePassword', () => {
     it('should update the user password', async () => {
-      const userId = 1; // Assuming you have a way to retrieve or mock a user ID
+      const userId = 1;
       const updatePasswordDto: UpdatePasswordDTO = {
         oldPassword: 'oldPassword123',
         newPassword: 'newPassword123'
       };
-      // Mock the AuthService's updatePassword method to simply resolve without throwing
       jest.spyOn(authService, 'updatePassword').mockImplementation(async () => undefined);
-
-      // Act and Assert
-      // Here you are calling the updatePassword method on your controller
-      // and checking that it resolves without throwing any error
       await expect(controller.updatePassword(userId, updatePasswordDto)).resolves.not.toThrow();
 
-      // Optionally, verify that the service method was called with correct parameters
       expect(authService.updatePassword).toHaveBeenCalledWith(
         userId,
         updatePasswordDto.oldPassword,
