@@ -1,11 +1,12 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { RedisService } from '@database/redis/redis.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
+import { UtilsService } from '@common/utils/utils.service';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
 import { User } from '@modules/users/entities/user.entity';
-import { Repository } from 'typeorm';
-import { RedisService } from '@database/redis/redis.service';
 import { Payload } from '@security/interfaces/payload.interface';
 
 /**
@@ -33,6 +34,7 @@ export class TokenService {
 
   /**
    * Constructs the TokenService with the required dependencies.
+   *
    * @param usersRepository The repository for user entities.
    * @param jwtService The service for creating and verifying JWT tokens.
    * @param configService The service for accessing environment variables.
@@ -43,7 +45,8 @@ export class TokenService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private redisService: RedisService
+    private redisService: RedisService,
+    private utilsService: UtilsService
   ) {
     this.accessTokenSecret = this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET');
     this.accessTokenExpiration = this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRATION');
@@ -67,7 +70,7 @@ export class TokenService {
     const token = this.generateAccessToken(payload);
     const refreshToken = this.generateRefreshToken(payload);
 
-    const refreshTokenTTL = this.convertDaysToSeconds(this.refreshTokenExpiration);
+    const refreshTokenTTL = this.utilsService.convertDaysToSeconds(this.refreshTokenExpiration);
     await this.redisService.set(`refresh_token_${user.userId}`, refreshToken, refreshTokenTTL);
     return { token, refreshToken };
   }
@@ -88,7 +91,7 @@ export class TokenService {
       const user = await this.usersRepository.findOneOrFail({ where: { userId } });
       const tokens = await this.getTokens(user);
 
-      const refreshTokenTTL = this.convertDaysToSeconds(this.refreshTokenExpiration);
+      const refreshTokenTTL = this.utilsService.convertDaysToSeconds(this.refreshTokenExpiration);
       await this.redisService.set(`refresh_token_${userId}`, tokens.refreshToken, refreshTokenTTL);
 
       return tokens;
@@ -175,16 +178,5 @@ export class TokenService {
   async refreshTokenExists(userId: number, refreshToken: string): Promise<boolean> {
     const storedToken = await this.redisService.get(`refresh_token_${userId}`);
     return storedToken === refreshToken;
-  }
-
-  /**
-   * Converts a duration string in days to seconds.
-   *
-   * @param duration The duration string to convert.
-   * @returns The duration in seconds.
-   */
-  private convertDaysToSeconds(duration: string): number {
-    const days = parseInt(duration.replace('d', ''), 10); // Assure la suppression du 'd' pour la conversion
-    return isNaN(days) ? 0 : days * 86400;
   }
 }
