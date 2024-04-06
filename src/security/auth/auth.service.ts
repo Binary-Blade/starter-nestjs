@@ -14,25 +14,18 @@ import { EncryptionService } from '@security/encryption/encryption.service';
  */
 @Injectable()
 export class AuthService {
-  /**
-   * AuthService constructor.
-   * @param usersRepository The TypeORM repository for User entities.
-   * @param encryptionService The service handling security concerns such as hashing.
-   * @param tokenService The service responsible for managing JWT tokens.
-   */
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private encryptionService: EncryptionService,
-    private tokenService: TokenService
+    @InjectRepository(User) private usersRepository: Repository<User>, // Repository for accessing User entity operations.
+    private encryptionService: EncryptionService, // Service for hashing and verifying passwords.
+    private tokenService: TokenService // Service for managing JWT tokens, including creation and validation.
   ) {}
 
   /**
-   * Handles user signup logic.
-   * @param createUserDto Data transfer object containing the user details.
-   * @param role The role assigned to the user, defaulting to UserRole.USER.
-   * @returns A promise that resolves to the newly created User entity.
-   * @throws UnauthorizedException if the email already exists.
+   * Signs up a new user with the provided details, hashes their password, and stores them in the database.
+   * @param createUserDto The DTO containing new user information, including email and password.
+   * @param role Optional: The role of the user, defaults to UserRole.USER if not specified.
+   * @returns The saved User entity.
+   * @throws UnauthorizedException If a user with the provided email already exists.
    */
   async signup(createUserDto: CreateUserDto, role: UserRole = UserRole.USER): Promise<User> {
     // Check for existing user with the same email
@@ -42,7 +35,6 @@ export class AuthService {
     if (existingUser) {
       throw new UnauthorizedException('Email already exists');
     }
-    // Hash the user's password
     const hashedPassword = await this.encryptionService.hashPassword(createUserDto.password);
     // Create a new user with the hashed password and the role
     const newUser = this.usersRepository.create({
@@ -56,13 +48,13 @@ export class AuthService {
   }
 
   /**
-   * Handles user login logic.
-   * @param email The email of the user trying to log in.
-   * @param password The plaintext password provided by the user for login.
-   * @returns A promise that resolves to an object containing JWT tokens.
-   * @throws InvalidCredentialsException if the login credentials are invalid.
+   * Authenticates a user with their email and password. If successful, generates JWT tokens for the session.
+   * @param email User's email address.
+   * @param password User's plain text password.
+   * @returns JWT access and refresh tokens for the authenticated session.
+   * @throws InvalidCredentialsException If the email doesn't exist or the password doesn't match.
    */
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<JWTTokens> {
     // Find the user by email
     const user = await this.usersRepository.findOneBy({ email });
     if (!user) {
@@ -73,26 +65,24 @@ export class AuthService {
     if (!validPassword) {
       throw new InvalidCredentialsException();
     }
-    // Save the user's last login date
-    user.lastLogin = new Date();
+    user.lastLogin = new Date(); // Updates the last login timestamp.
     await this.usersRepository.save(user);
-    // Generate JWT tokens for the user
-    const tokens = await this.tokenService.getTokens(user);
-    return tokens;
+
+    return this.tokenService.getTokens(user); // Generates and returns JWT tokens for the user.
   }
 
   /**
-   * Handles user logout logic.
-   * @param  userId The ID of the user to log out.
-   * @returns A promise that resolves when the user is logged out.
+   * Logs out a user by invalidating their current refresh token and incrementing their token version.
+   * @param userId The ID of the user to logout.
+   * @throws NotFoundException If the user ID does not exist in the database.
    */
   async logout(userId: number): Promise<void> {
     const user = await this.usersRepository.findOneBy({ userId });
     if (!user) {
       throw new NotFoundException('User not connected');
     }
-    await this.tokenService.removeRefreshToken(userId);
-    user.tokenVersion += 1; // Incrementing the tokenVersion invalidates previous tokens.
+    await this.tokenService.removeRefreshToken(userId); // Invalidate the current refresh token.
+    user.tokenVersion += 1; // Incrementing the token version invalidates all previously issued tokens.
     await this.usersRepository.save(user);
   }
 }
