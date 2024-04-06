@@ -141,7 +141,7 @@ describe('TokenService', () => {
     describe('removeRefreshToken', () => {
       it('should successfully remove the refresh token', async () => {
         const mockUserId = 1;
-        jest.spyOn(redisService, 'del').mockResolvedValue(1);
+        jest.spyOn(redisService, 'del').mockResolvedValue('Key deleted: refresh_token_1');
 
         const result = await service.removeRefreshToken(mockUserId);
 
@@ -151,7 +151,7 @@ describe('TokenService', () => {
 
       it('should not throw an error if the refresh token does not exist', async () => {
         const mockUserId = 2;
-        jest.spyOn(redisService, 'del').mockResolvedValue(0);
+        jest.spyOn(redisService, 'del').mockResolvedValue('Key not found: refresh_token_2');
 
         await expect(service.removeRefreshToken(mockUserId)).resolves.toBeUndefined();
       });
