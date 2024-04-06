@@ -14,8 +14,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        synchronize: false, // Disable auto schema synchronization to prevent data loss in production
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'] // Adjust the path as necessary
+        synchronize: false,
+        entities: [__dirname + '/../**/*.entity{.ts,.js}']
       })
     })
   ]
