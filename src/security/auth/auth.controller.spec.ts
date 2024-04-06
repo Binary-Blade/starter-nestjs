@@ -6,6 +6,7 @@ import { LoginDTO } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokenService } from '@security/token/token.service';
 import { AccessTokenGuard } from '@security/guards';
+import { UpdatePasswordDTO } from './dto/update-password.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -79,6 +80,29 @@ describe('AuthController', () => {
     });
   });
 
+  describe('updatePassword', () => {
+    it('should update the user password', async () => {
+      const userId = 1; // Assuming you have a way to retrieve or mock a user ID
+      const updatePasswordDto: UpdatePasswordDTO = {
+        oldPassword: 'oldPassword123',
+        newPassword: 'newPassword123'
+      };
+      // Mock the AuthService's updatePassword method to simply resolve without throwing
+      jest.spyOn(authService, 'updatePassword').mockImplementation(async () => undefined);
+
+      // Act and Assert
+      // Here you are calling the updatePassword method on your controller
+      // and checking that it resolves without throwing any error
+      await expect(controller.updatePassword(userId, updatePasswordDto)).resolves.not.toThrow();
+
+      // Optionally, verify that the service method was called with correct parameters
+      expect(authService.updatePassword).toHaveBeenCalledWith(
+        userId,
+        updatePasswordDto.oldPassword,
+        updatePasswordDto.newPassword
+      );
+    });
+  });
   describe('refreshToken', () => {
     it('should refresh the access token', async () => {
       const refreshTokenDto: RefreshTokenDto = { refreshToken: 'some-refresh-token' };

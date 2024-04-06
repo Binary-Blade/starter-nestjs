@@ -8,6 +8,7 @@ import { CreateUserDto } from '@modules/users/dto';
 import { EncryptionService } from '@security/encryption/encryption.service';
 import { TokenService } from '@security/token/token.service';
 import { User } from '@modules/users/entities/user.entity';
+import { InvalidCredentialsException } from '@common/exceptions/invalid-credentials.exception';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -93,6 +94,56 @@ describe('AuthService', () => {
       jest.spyOn(tokenService, 'getTokens').mockResolvedValue(jwtTokens);
 
       expect(await authService.login(email, password)).toEqual(jwtTokens);
+    });
+  });
+
+  describe('updatePassword', () => {
+    it('should successfully update the user password', async () => {
+      const userId = 1;
+      const oldPassword = 'oldPassword';
+      const newPassword = 'newPassword';
+      const user = new User();
+      user.userId = userId;
+      user.password = 'hashedOldPassword';
+
+      jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(user);
+      jest.spyOn(encryptionService, 'verifyPassword').mockResolvedValue(true);
+      jest.spyOn(encryptionService, 'hashPassword').mockResolvedValue('hashedNewPassword');
+      jest.spyOn(usersRepository, 'save').mockResolvedValue(user);
+
+      await authService.updatePassword(userId, oldPassword, newPassword);
+
+      expect(usersRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ password: 'hashedNewPassword' })
+      );
+    });
+
+    it('should throw an error if old password is incorrect', async () => {
+      const userId = 1;
+      const oldPassword = 'wrongOldPassword';
+      const newPassword = 'newPassword';
+      const user = new User();
+      user.userId = userId;
+      user.password = 'hashedOldPassword';
+
+      jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(user);
+      jest.spyOn(encryptionService, 'verifyPassword').mockResolvedValue(false);
+
+      await expect(authService.updatePassword(userId, oldPassword, newPassword)).rejects.toThrow(
+        InvalidCredentialsException
+      );
+    });
+
+    it('should throw a NotFoundException if the user does not exist', async () => {
+      const userId = 1;
+      const oldPassword = 'oldPassword';
+      const newPassword = 'newPassword';
+
+      jest.spyOn(usersRepository, 'findOneBy').mockResolvedValue(null);
+
+      await expect(authService.updatePassword(userId, oldPassword, newPassword)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
