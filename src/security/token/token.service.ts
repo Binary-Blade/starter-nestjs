@@ -15,12 +15,30 @@ import { Payload } from '@security/interfaces/payload.interface';
 
 @Injectable()
 export class TokenService {
+  /**
+   * Initializes the TokenService with the required dependencies.
+   *
+   * @param logger The service for logging information.
+   * @param accessTokenSecret The secret used to sign access tokens.
+   * @param accessTokenExpiration The duration for which access tokens are valid.
+   * @param refreshTokenSecret The secret used to sign refresh tokens.
+   * @param refreshTokenExpiration The duration for which refresh tokens are valid.
+   * @returns An instance of the TokenService.
+   */
   private readonly accessTokenSecret: string;
   private readonly accessTokenExpiration: string;
   private readonly refreshTokenSecret: string;
   private readonly refreshTokenExpiration: string;
   private readonly logger = new Logger(TokenService.name);
 
+  /**
+   * Initializes the TokenService with the required dependencies.
+   *
+   * @param usersRepository The repository for user entities.
+   * @param jwtService The service for signing and verifying JWT tokens.
+   * @param configService The service for accessing environment variables.
+   * @param redisService The service for interacting with the Redis store.
+   */
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
     private jwtService: JwtService,
@@ -54,6 +72,13 @@ export class TokenService {
     return { token, refreshToken };
   }
 
+  /**
+   * Refreshes the access token using a valid refresh token.
+   *
+   * @param token The refresh token used to generate a new access token.
+   * @returns A promise that resolves to an object containing the new access and refresh tokens.
+   * @throws UnauthorizedException If the refresh token is invalid or expired.
+   */
   async refreshToken(token: string): Promise<JWTTokens> {
     this.logger.debug(`Refreshing token for token: ${token}`);
     try {
@@ -73,6 +98,13 @@ export class TokenService {
     }
   }
 
+  /**
+   * Verifies the validity of a refresh token and returns the user ID associated with the token.
+   *
+   * @param token The refresh token to verify.
+   * @returns A promise that resolves to the user ID associated with the refresh token.
+   * @throws UnauthorizedException If the refresh token is invalid or expired.
+   */
   async verifyRefreshToken(token: string): Promise<number> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -97,6 +129,12 @@ export class TokenService {
     }
   }
 
+  /**
+   * Generates a new access token using the provided payload.
+   *
+   * @param payload The payload to include in the access token.
+   * @returns The generated access token.
+   */
   private generateAccessToken(payload: Payload): string {
     return this.jwtService.sign(payload, {
       secret: this.accessTokenSecret,
@@ -104,6 +142,12 @@ export class TokenService {
     });
   }
 
+  /**
+   * Generates a new refresh token using the provided payload.
+   *
+   * @param payload The payload to include in the refresh token.
+   * @returns The generated refresh token.
+   */
   private generateRefreshToken(payload: Payload): string {
     return this.jwtService.sign(payload, {
       secret: this.refreshTokenSecret,
@@ -111,15 +155,34 @@ export class TokenService {
     });
   }
 
+  /**
+   * Removes the refresh token associated with the provided user ID.
+   *
+   * @param userId The ID of the user for whom to remove the refresh token.
+   * @returns A promise that resolves when the refresh token is successfully removed.
+   */
   async removeRefreshToken(userId: number) {
     await this.redisService.del(`refresh_token_${userId}`);
   }
 
+  /**
+   * Checks if a refresh token exists in the Redis store for the provided user ID.
+   *
+   * @param userId The ID of the user for whom to check the refresh token.
+   * @param refreshToken The refresh token to check.
+   * @returns A promise that resolves to true if the refresh token exists, or false otherwise.
+   */
   async refreshTokenExists(userId: number, refreshToken: string): Promise<boolean> {
     const storedToken = await this.redisService.get(`refresh_token_${userId}`);
     return storedToken === refreshToken;
   }
 
+  /**
+   * Converts a duration string in days to seconds.
+   *
+   * @param duration The duration string to convert.
+   * @returns The duration in seconds.
+   */
   private convertDaysToSeconds(duration: string): number {
     const days = parseInt(duration.replace('d', ''), 10); // Assure la suppression du 'd' pour la conversion
     return isNaN(days) ? 0 : days * 86400;
