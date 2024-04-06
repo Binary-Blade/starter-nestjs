@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisModule } from '@database/redis/redis.module';
+import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { RedisService } from '@database/redis/redis.service';
+import { UtilsService } from '@common/utils/utils.service';
 import { UsersService } from '@modules/users/users.service';
 import { TokenService } from '@security/token/token.service';
 import { EncryptionService } from '@security/encryption/encryption.service';
+import { AuthController } from './auth.controller';
 import { User } from '@modules/users/entities/user.entity';
-import { RedisModule } from '@database/redis/redis.module';
-import { RedisService } from '@database/redis/redis.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), RedisModule], // Registers the User entity for TypeORM
@@ -19,7 +20,8 @@ import { RedisService } from '@database/redis/redis.service';
     TokenService, // The service responsible for handling token-related operations
     JwtService, // Nest's JwtService for JWT operations such as signing and verification
     EncryptionService, // A service for handling common security tasks such as hashing
-    RedisService
+    UtilsService, // A utility service for common tasks such as generating random strings
+    RedisService // A service for interacting with the Redis store
   ]
 })
 export class AuthModule {}

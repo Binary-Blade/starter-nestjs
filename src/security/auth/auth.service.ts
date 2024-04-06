@@ -29,9 +29,8 @@ export class AuthService {
    */
   async signup(createUserDto: CreateUserDto, role: UserRole = UserRole.USER): Promise<User> {
     // Check for existing user with the same email
-    const existingUser = await this.usersRepository.findOne({
-      select: ['userId'],
-      where: { email: createUserDto.email }
+    const existingUser = await this.usersRepository.findOneBy({
+      email: createUserDto.email
     });
     if (existingUser) {
       throw new UnauthorizedException('Email already exists');
@@ -84,7 +83,7 @@ export class AuthService {
   async updatePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
     const user = await this.usersRepository.findOneBy({ userId });
     if (!user) {
-      throw new InvalidCredentialsException();
+      throw new NotFoundException();
     }
     const validPassword = await this.encryptionService.verifyPassword(user.password, oldPassword);
     if (!validPassword) {
@@ -103,10 +102,7 @@ export class AuthService {
    * @throws NotFoundException If the user ID does not exist in the database.
    */
   async logout(userId: number): Promise<void> {
-    const user = await this.usersRepository.findOne({
-      select: ['userId', 'tokenVersion'], // Sélectionne uniquement l'identifiant et tokenVersion
-      where: { userId }
-    });
+    const user = await this.usersRepository.findOneBy({ userId });
     if (!user) {
       throw new NotFoundException('User not connected');
     }
