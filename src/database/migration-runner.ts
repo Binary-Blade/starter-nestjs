@@ -2,9 +2,10 @@ import { Logger } from '@nestjs/common';
 import datasource from './typeorm-cli.config';
 
 /**
- * Executes database migrations using the TypeORM CLI configuration.
- * This function initializes the data source and runs all pending migrations.
- * It is intended to be used at the application startup to ensure the database schema is up to date.
+ * Run migrations to update the database schema to the latest version
+ * If migration fails, the app will not start
+ *
+ * @returns void
  */
 export async function runMigrations() {
   const logger = new Logger('migrationRunner');

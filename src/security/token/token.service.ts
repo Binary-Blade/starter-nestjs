@@ -16,16 +16,6 @@ import { Payload } from '@security/interfaces/payload.interface';
 
 @Injectable()
 export class TokenService {
-  /**
-   * Initializes the TokenService with the required dependencies.
-   *
-   * @param logger The service for logging information.
-   * @param accessTokenSecret The secret used to sign access tokens.
-   * @param accessTokenExpiration The duration for which access tokens are valid.
-   * @param refreshTokenSecret The secret used to sign refresh tokens.
-   * @param refreshTokenExpiration The duration for which refresh tokens are valid.
-   * @returns An instance of the TokenService.
-   */
   private readonly accessTokenSecret: string;
   private readonly accessTokenExpiration: string;
   private readonly refreshTokenSecret: string;
@@ -39,7 +29,6 @@ export class TokenService {
    * @param jwtService The service for creating and verifying JWT tokens.
    * @param configService The service for accessing environment variables.
    * @param redisService The service for interacting with the Redis store.
-   * @returns An instance of the TokenService.
    */
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,

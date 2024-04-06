@@ -2,10 +2,9 @@
 ARG IMAGE=node:18.19.0-alpine
 
 ## COMMON STAGE
-# Set up the common builder stage using the Node.js Alpine image.
+# Create a common image from the Node.js Alpine image.
 FROM $IMAGE as builder
 WORKDIR /app
-# Copy the application source code into the container.
 COPY . .
 # Install pnpm globally and then use it to install project dependencies.
 RUN npm install -g pnpm && \
@@ -14,33 +13,28 @@ RUN npm install -g pnpm && \
 ## DEVELOPMENT STAGE
 # Create a development image from the builder stage.
 FROM builder as dev
-# The development container does not need a command as it will likely be overridden.
 
 ## PRODUCTION BUILD STAGE
 # Prepare the production build from the builder stage.
 FROM builder as prod-build
-# Build the application using pnpm.
-RUN pnpm run build 
-# Prune development dependencies to minimize the image size.
-RUN pnpm prune --production 
+RUN pnpm run build  # Build the application using pnpm.
+RUN pnpm prune --production  # Prune development dependencies to minimize the image size.
 
 ## PRODUCTION STAGE
-# Create the final production image using the same Node.js Alpine base image.
-FROM $IMAGE as prod 
-# Copy the built application and node_modules from the prod-build stage.
+# Create a production image from the Node.js Alpine image.
+FROM $IMAGE as prod
+
+# Copy the built application and production dependencies into the container.
 COPY --chown=node:node --from=prod-build /app/dist /app/dist
 COPY --chown=node:node --from=prod-build /app/node_modules /app/node_modules
-# Ensure the .env file is available in production for environment configuration.
+# Copy the .env file into the container.
 COPY --chown=node:node --from=prod-build /app/.env /app/dist/.env
 
-# Set the NODE_ENV environment variable to production.
+# Set the NODE_ENV environment variable to 'production'.
 ENV NODE_ENV=production
-# Define the entry point to run the application.
-ENTRYPOINT [ "node", "./main.js" ]
-# Set the working directory to the dist folder containing the built application.
-WORKDIR /app/dist
-# Default command to run (can be overridden by docker run commands).
+ENTRYPOINT [ "node", "./main.js" ] # Set the entrypoint to the main.js file.
+WORKDIR /app/dist # Set the working directory to the dist folder.
 
-# Run the container as the non-root 'node' user for security.
+# Set the user to the node user.
 USER node
 

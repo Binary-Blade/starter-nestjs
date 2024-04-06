@@ -11,6 +11,15 @@ import { EncryptionService } from '@security/encryption/encryption.service';
 import { AuthController } from './auth.controller';
 import { User } from '@modules/users/entities/user.entity';
 
+/**
+ * Module for handling authentication-related operations.
+ *
+ * @class AuthModule class (module) for handling authentication-related operations
+ * @method imports Import the necessary modules for this module
+ * @method controllers Register the controllers that are part of this module
+ * @method providers Register the services that are part of this module
+ *
+ */
 @Module({
   imports: [TypeOrmModule.forFeature([User]), RedisModule], // Registers the User entity for TypeORM
   controllers: [AuthController], // The controllers that are part of this module

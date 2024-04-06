@@ -7,6 +7,11 @@ import { HttpExceptionFilter } from '@common/globals-filter/http-exceptions-filt
 import { WinstonLoggerService } from '@common/logger/winston.service';
 import { ConfigService } from '@nestjs/config';
 
+/**
+ * Bootstrap the application
+ *
+ * @returns void
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new WinstonLoggerService() // Custom Winston logger
@@ -14,6 +19,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  // Enable CORS for the frontend URL
   app.enableCors({
     origin: configService.get('FRONTEND_URL'),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

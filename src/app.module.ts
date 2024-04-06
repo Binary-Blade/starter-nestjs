@@ -5,23 +5,21 @@ import { RedisModule } from '@database/redis/redis.module';
 import { DatabaseModule } from '@database/database.module';
 import { AuthModule } from '@security/auth/auth.module';
 /**
- * The root module of the application. It bundles all feature modules and
- * global configurations like environment variables and database setup.
+ * Main application module
+ *
+ * @class AppModule class (module) for the main application
+ * @method imports Import the necessary modules for this application
+ * @returns AppModule
  */
 @Module({
   imports: [
     // Global configuration module that loads environment variables.
-    ConfigModule.forRoot({
-      envFilePath: './.env',
-      isGlobal: true
-    }),
+    ConfigModule.forRoot({ envFilePath: './.env', isGlobal: true }),
     DatabaseModule,
     RedisModule,
     AuthModule,
     UsersModule
-
-    // NOTE: Configure it to prevent abuse of the API instead of nginx if necessary.
-    // ThrollerModule
+    // ThrollerModule  NOTE: Configure it to prevent abuse of the API instead of nginx if necessary.
   ]
 })
 export class AppModule {}

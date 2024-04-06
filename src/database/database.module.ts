@@ -2,6 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+/**
+ * Database module for setting up TypeORM
+ *
+ * @class DatabaseModule class (module) for setting up TypeORM
+ * @method forRootAsync Configure TypeORM based on environment
+ * @returns TypeORM configuration
+ */
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({

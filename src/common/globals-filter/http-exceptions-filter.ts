@@ -15,6 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   /**
    * Method to catch and handle HTTP exceptions.
+   *
    * @param exception The caught HttpException.
    * @param host The arguments host containing information about the request context.
    */
@@ -38,6 +39,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       errorResponse['stack'] = exception.stack;
     }
 
+    // Log the error message and send the response.
     this.logger.error(`Http Status: ${status}, Exception Message: ${exception.message}`);
     response.status(status).json(errorResponse);
   }
