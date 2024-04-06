@@ -129,7 +129,7 @@ Feel free to dive into the Dockerfile and docker-compose.yml files to understand
 ## Running redis
 - To run redis, use the following command:
 ```bash
-make redis
+make redis-cli
 ```
 
 ## Running Migrations

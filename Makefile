@@ -20,7 +20,7 @@ test:
 # === REDIS ====
 
 # Connect to the redis cli
-redis:
+redis-cli:
 	docker-compose exec redis redis-cli
 
 .PHONY: migrate-create migrate-run migrate-revert test redis
