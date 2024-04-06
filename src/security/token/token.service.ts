@@ -12,6 +12,7 @@ import { Payload } from '@security/interfaces/payload.interface';
  * Service responsible for managing JWT tokens, including their creation and validation.
  * This service utilizes the JwtService for signing tokens with specified secrets and expiration times.
  */
+
 @Injectable()
 export class TokenService {
   private readonly accessTokenSecret: string;
@@ -72,7 +73,7 @@ export class TokenService {
     }
   }
 
-  private async verifyRefreshToken(token: string): Promise<number> {
+  async verifyRefreshToken(token: string): Promise<number> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.refreshTokenSecret
