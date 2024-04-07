@@ -5,9 +5,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '@modules/users/entities/user.entity';
 import { TokenService } from '@security/token/token.service';
 import { RedisService } from '@database/redis/redis.service';
-import { UserRole } from '@modules/users/enums/user-role.enum';
 import { UnauthorizedException } from '@nestjs/common';
 import { UtilsService } from '@common/utils/utils.service';
+import { UserRole } from '@common/enums/user-role.enum';
 
 describe('TokenService', () => {
   let service: TokenService;

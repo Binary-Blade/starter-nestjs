@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { UserRole } from '@modules/users/enums/user-role.enum';
 import { ROLE_KEY } from '@common/decorators/role.decorator';
+import { UserRole } from '@common/enums/user-role.enum';
 
 /**
  * A guard that enforces role-based access control. It checks if the
