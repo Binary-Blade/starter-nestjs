@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UtilsService } from '@common/utils/utils.service';
 import { JWTTokens } from '@common/interfaces/jwt.interface';
 import { User } from '@modules/users/entities/user.entity';
-import { Payload } from '@security/interfaces/payload.interface';
+import { Payload } from '@common/interfaces/payload.interface';
 
 /**
  * Service responsible for managing JWT tokens, including their creation and validation.
